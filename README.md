@@ -1,2 +1,2 @@
-# oss-template
-Template repository for open-source projects
+# template
+Gradle plugin template
