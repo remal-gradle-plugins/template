@@ -1,0 +1,107 @@
+allprojects {
+    apply plugin: 'checkstyle'
+
+    configurations.named('projectDependencyConstraints') { Configuration conf ->
+        conf.dependencyConstraints.addAll(
+            [
+                'com.puppycrawl.tools:checkstyle:8.41.1',
+            ].collect { project.dependencies.constraints.create(it) }
+        )
+    }
+
+    checkstyle {
+        ignoreFailures = false
+        configDirectory = rootProject.projectDir
+
+        toolVersion = project.configurations.checkstyle
+            .allDependencyConstraints
+            .matching { it.group == 'com.puppycrawl.tools' && it.name == 'checkstyle' }
+            .matching { it.version != null && !it.version.isEmpty() }
+            .first()
+            .version
+    }
+
+    pluginManager.withPlugin('java') {
+        sourceSets.all { SourceSet sourceSet ->
+            tasks.withType(Checkstyle)
+                .matching { it.name == sourceSet.getTaskName('checkstyle', null) }
+                .configureEach { Checkstyle task ->
+                    task.dependsOn(sourceSet.output)
+                    task.dependsOn(sourceSet.compileClasspath)
+                    if (sourceSet.name == SourceSet.MAIN_SOURCE_SET_NAME) {
+                        task.dependsOn(sourceSet.jarTaskName)
+                    }
+                }
+        }
+    }
+
+    tasks.withType(Checkstyle) { onlyIf { reports.xml.enabled = true; return true } }
+    project.gradle.taskGraph.afterTask { Task task ->
+        if (!(task instanceof Checkstyle)) return
+        Checkstyle checkstyleTask = (Checkstyle) task
+        File xmlFile = checkstyleTask.reports.xml.outputLocation.get().asFile
+        File xmlFileDir = file(xmlFile.parent)
+        File destinationDir = file(
+            "${rootProject.buildDir}/reports/checkstyle${checkstyleTask.project.path.replaceAll(/:/, '-')}"
+                .replaceFirst(/-$/, '')
+        )
+        if (xmlFile.isFile()) {
+            if (xmlFileDir != destinationDir) {
+                project.copy {
+                    from(xmlFile)
+                    into(destinationDir)
+                }
+            }
+        } else {
+            File destinationFile = new File(destinationDir, xmlFile.name)
+            destinationFile.parentFile.mkdirs()
+            destinationFile.setText(
+                [
+                    '<?xml version="1.0" encoding="UTF-8"?>',
+                    '<checkstyle version="' + task.project.checkstyle.toolVersion + '"/>',
+                ].join('\n'),
+                'UTF-8'
+            )
+        }
+    }
+
+
+    if (project == rootProject) {
+        tasks.maybeCreate('configureIdea').doLast {
+            File configFile = file("${rootProjectDir}/.idea/checkstyle-idea.xml")
+            if (!configFile.isFile()) {
+                return
+            }
+
+            String toolVersion = checkstyle.toolVersion
+            if (toolVersion == null || toolVersion.isBlank()) return
+
+            Class XmlParser = Class.forName('groovy.xml.XmlParser')
+            def xmlParser = XmlParser.getConstructor(Boolean.TYPE, Boolean.TYPE).newInstance(false, false)
+            def rootNode = xmlParser.parse(configFile)
+            def component = rootNode.component.find()
+            if (component?.attribute('name') != 'CheckStyle-IDEA') return
+
+            boolean isChanged = false
+            component.option?.map?.entry?.forEach { entry ->
+                if (entry.attribute('key') == 'checkstyle-version'
+                    && entry.attribute('value') != toolVersion
+                ) {
+                    entry.attributes()['value'] = toolVersion
+                    isChanged = true
+                }
+            }
+
+            if (isChanged) {
+                StringWriter stringWriter = new StringWriter()
+                Class XmlNodePrinter = Class.forName('groovy.xml.XmlNodePrinter')
+                def xmlNodePrinter = XmlNodePrinter.getConstructor(PrintWriter, String)
+                    .newInstance(new PrintWriter(stringWriter), '  ')
+                xmlNodePrinter.print(rootNode)
+
+                String content = stringWriter.toString().trim()
+                configFile.setText(content, 'UTF-8')
+            }
+        }
+    }
+}

@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <type id="AngularCLI" />
+    <type id="hibernate" />
+    <type id="javaeeApplication" />
+    <type id="jpa" />
+    <type id="Spring" />
+    <type id="web" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>
