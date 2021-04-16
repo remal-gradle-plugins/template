@@ -30,19 +30,19 @@ jobs:
       id: cache
       uses: actions/cache@v2
       with:
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/**', '**/*.gradle') }}
+        key: ${{runner.os}}-gradle-${{hashFiles('gradle/wrapper/**', '**/*.gradle')}}
         path: |
           ~/.gradle
     - name: Setup Java 11
-      if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      if: ${{steps.cache.outputs.cache-hit != 'true'}}
       uses: actions/setup-java@v2
       with:
         java-version: 11
         distribution: zulu
     - name: Create cache content
-      if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      if: ${{steps.cache.outputs.cache-hit != 'true'}}
       run: |
-        ./gradlew downloadDependencies
+        ./retry ./gradlew downloadDependencies
 
   build:
     needs:
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
-      gradle-versions: ${{ steps.gradle-versions.outputs.stableMinorAndLatestUnstable }}
+      gradle-versions: ${{steps.gradle-versions.outputs.stableMinorAndLatestUnstable}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
     - name: Cache
       uses: actions/cache@v2
       with:
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/**', '**/*.gradle') }}
+        key: ${{runner.os}}-gradle-${{hashFiles('gradle/**', '**/*.gradle')}}
         path: |
           ~/.gradle
     - name: Setup Java 11
@@ -76,12 +76,14 @@ jobs:
     - name: Build
       run: |
         ./gradlew build -Pdisable-test=true
-    - name: Upload workspace
+    - name: Archive workspace
+      run: |
+        tar -czf /workspace.tar.gz "${{github.workspace}}"
+    - name: Upload workspace archive
       uses: actions/upload-artifact@v2
       with:
         name: workspace
-        path: |
-          **/build/
+        path: /workspace.tar.gz
         if-no-files-found: error
     - name: Read min supported Gradle version
       id: min-gradle-version
@@ -96,12 +98,12 @@ jobs:
         group: name.remal.gradle-api
         name: gradle-api
         repository: https://maven.pkg.github.com/remal-gradle-api/packages
-        user: ${{ github.actor }}
-        password: ${{ github.token }}
-        min: ${{ steps.min-gradle-version.outputs.value }}
+        user: ${{github.actor}}
+        password: ${{github.token}}
+        min: ${{steps.min-gradle-version.outputs.value}}
 
   cross-versions-test:
-    if: ${{ needs.build.outputs.gradle-versions != '[""]' }}
+    if: ${{needs.build.outputs.gradle-versions != '[""]'}}
     needs:
     - build
     name: Cross Gradle versions test
@@ -111,7 +113,7 @@ jobs:
       DISABLE_COMPILATION: 'true'
     strategy:
       matrix:
-        gradle-version: ${{ fromJSON(needs.build.outputs.gradle-versions) }}
+        gradle-version: ${{fromJSON(needs.build.outputs.gradle-versions)}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -121,7 +123,7 @@ jobs:
     - name: Cache
       uses: actions/cache@v2
       with:
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/**', '**/*.gradle') }}
+        key: ${{runner.os}}-gradle-${{hashFiles('gradle/**', '**/*.gradle')}}
         path: |
           ~/.gradle
     - name: Setup Java 11
@@ -129,10 +131,13 @@ jobs:
       with:
         java-version: 11
         distribution: zulu
-    - name: Download workspace
+    - name: Download workspace archive
       uses: actions/download-artifact@v2
       with:
         name: workspace
+    - name: Unarchive workspace
+      run: |
+        tar -xzf /workspace.tar.gz
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
