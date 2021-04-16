@@ -4,6 +4,8 @@ allprojects {
         doLast {
             project.configurations
                 .findAll { it.canBeResolved }
+                .findAll { it.name != 'default' }
+                .findAll { it.name != 'archives' }
                 .forEach { configuration ->
                     configuration.resolvedConfiguration.lenientConfiguration.files
                 }

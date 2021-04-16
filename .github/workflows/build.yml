@@ -80,12 +80,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: workspace
-        path: '${{github.workspace}}/'
-    - name: Upload Gradle home
-      uses: actions/upload-artifact@v2
-      with:
-        name: gradle-home
-        path: '~/.gradle/'
+        path: |
+          **/build/
+        if-no-files-found: error
     - name: Read min supported Gradle version
       id: min-gradle-version
       uses: christian-draeger/read-properties@1.0.1
@@ -116,15 +113,22 @@ jobs:
       matrix:
         gradle-version: ${{ fromJSON(needs.build.outputs.gradle-versions) }}
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/**', '**/*.gradle') }}
+        path: |
+          ~/.gradle
     - name: Setup Java 11
       uses: actions/setup-java@v2
       with:
         java-version: 11
         distribution: zulu
-    - name: Download Gradle home
-      uses: actions/download-artifact@v2
-      with:
-        name: gradle-home
     - name: Download workspace
       uses: actions/download-artifact@v2
       with:
