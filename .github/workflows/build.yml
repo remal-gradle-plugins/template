@@ -78,12 +78,12 @@ jobs:
         ./gradlew build -Pdisable-test=true
     - name: Archive workspace
       run: |
-        tar -czf /workspace.tar.gz "${{github.workspace}}"
+        tar -czf "/tmp/workspace-${{github.run_id}}.tar.gz" "${{github.workspace}}"
     - name: Upload workspace archive
       uses: actions/upload-artifact@v2
       with:
         name: workspace
-        path: /workspace.tar.gz
+        path: '/tmp/workspace-${{github.run_id}}.tar.gz'
         if-no-files-found: error
     - name: Read min supported Gradle version
       id: min-gradle-version
@@ -137,7 +137,7 @@ jobs:
         name: workspace
     - name: Unarchive workspace
       run: |
-        tar -xzf /workspace.tar.gz
+        tar -xzf "/tmp/workspace-${{github.run_id}}.tar.gz"
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
