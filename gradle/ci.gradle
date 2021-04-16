@@ -39,6 +39,12 @@ allprojects {
 
         if (property('disable-compilation')?.toString()?.toBoolean()) {
             tasks.matching { it instanceof AbstractCompile }.all { disableTask(it) }
+
+            pluginManager.withPlugin('java') {
+                sourceSets.all { SourceSet sourceSet ->
+                    tasks.matching { it.name == sourceSet.processResourcesTaskName }.all { disableTask(it) }
+                }
+            }
         }
 
         if (property('disable-test')?.toString()?.toBoolean()) {
