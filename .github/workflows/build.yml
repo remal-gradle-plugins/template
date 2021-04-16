@@ -135,6 +135,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: workspace
+        path: /tmp/
     - name: Unarchive workspace
       run: |
         tar -xzf "/tmp/workspace-${{github.run_id}}.tar.gz"
