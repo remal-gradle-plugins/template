@@ -1,0 +1,22 @@
+import org.gradle.util.GradleVersion
+
+allprojects {
+    def getRootProperty = { String name, String defaultValue ->
+        String envName = name.replaceAll(/[^\w]/, '_').toUpperCase()
+        return rootProject.findProperty(name)
+            ?: System.getProperty(name)
+            ?: System.getenv(envName)
+            ?: defaultValue
+    }
+
+    ext['gradle-api.version'] = getRootProperty('gradle-api.version', GradleVersion.current().version)
+
+    ext['disable-compilation'] = getRootProperty('disable-compilation', 'false')
+    ext['disable-test'] = getRootProperty('disable-test', 'false')
+
+    ext['baseJavaPackage'] = "name.remal.gradle-plugins.${rootProject.name}${project.path}"
+        .replace('-', '')
+        .replace(':', '.')
+        .replaceFirst(/\.+$/, '')
+        .replaceAll(/\.{2,}/, '.')
+}

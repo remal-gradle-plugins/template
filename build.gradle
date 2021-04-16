@@ -1,0 +1,26 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+buildscript {
+    dependencies {
+        classpath 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext:1.0'
+    }
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+apply from: 'gradle/properties.gradle'
+apply from: 'gradle/java.gradle'
+apply from: 'gradle/ci.gradle'
+apply from: 'gradle/ide.gradle'
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+apply plugin: 'java-library'
+
+dependencies {
+    compileOnly 'name.remal.gradle-api:gradle-api'
+}

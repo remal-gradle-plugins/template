@@ -1,0 +1,62 @@
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
+
+idea {
+    project {
+        jdkName = '11'
+        targetBytecodeVersion = JavaVersion.VERSION_1_8
+        languageLevel = new IdeaLanguageLevel(targetBytecodeVersion.majorVersion)
+
+        settings {
+            doNotDetectFrameworks('android', 'web', 'javaeeApplication', 'Spring', 'jpa', 'hibernate', 'AngularCLI')
+
+            encodings {
+                encoding = 'UTF-8'
+                bomPolicy = 'WITH_NO_BOM'
+                properties {
+                    encoding = 'ISO-8859-1'
+                    transparentNativeToAsciiConversion = true
+                }
+            }
+
+            delegateActions {
+                delegateBuildRunToGradle = true
+                testRunner = 'GRADLE'
+            }
+        }
+    }
+}
+
+allprojects {
+    pluginManager.withPlugin('java') {
+        afterEvaluate {
+            String projectAbsolutePathPrefix = project.projectDir.absolutePath.replace(File.separator, '/') + '/'
+            def getModulePath = { File srcDir ->
+                String absolutePath = srcDir.absolutePath.replace(File.separator, '/')
+                if (absolutePath.startsWith(projectAbsolutePathPrefix)) {
+                    return absolutePath.substring(projectAbsolutePathPrefix.length())
+                } else {
+                    return absolutePath
+                }
+            }
+
+            idea.module?.settings {
+                sourceSets.all { SourceSet sourceSet ->
+                    sourceSet.java.srcDirs.forEach { srcDir ->
+                        packagePrefix[getModulePath(srcDir)] = property('baseJavaPackage')
+                    }
+                }
+            }
+        }
+    }
+}
+
+allprojects {
+    pluginManager.withPlugin('java') {
+        sourceSets.all {
+            configurations[it.compileOnlyConfigurationName].canBeResolved = true
+        }
+    }
+}

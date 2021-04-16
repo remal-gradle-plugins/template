@@ -1,0 +1,37 @@
+allprojects {
+
+    tasks.register('allClasses') { Task task ->
+        pluginManager.withPlugin('java') {
+            sourceSets.all { SourceSet sourceSet ->
+                task.dependsOn(sourceSet.classesTaskName)
+            }
+        }
+    }
+
+    tasks.register('allTests') { Task task ->
+        task.dependsOn(tasks.matching { it instanceof AbstractTestTask })
+    }
+
+
+    afterEvaluate {
+        def disableTask = { Task task ->
+            task.enabled = false
+            task.onlyIf { false }
+            task.dependsOn = []
+            Iterator registeredFileProperties = task.inputs.registeredFileProperties.iterator()
+            while (registeredFileProperties.hasNext()) {
+                registeredFileProperties.next()
+                registeredFileProperties.remove()
+            }
+        }
+
+        if (property('disable-compilation')?.toString()?.toBoolean()) {
+            tasks.matching { it instanceof AbstractCompile }.all { disableTask(it) }
+        }
+
+        if (property('disable-test')?.toString()?.toBoolean()) {
+            tasks.matching { it instanceof AbstractTestTask }.all { disableTask(it) }
+        }
+    }
+
+}
