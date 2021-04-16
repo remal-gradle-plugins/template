@@ -42,7 +42,7 @@ jobs:
     - name: Create cache content
       if: ${{ steps.cache.outputs.cache-hit != 'true' }}
       run: |
-        ./gradlew help
+        ./gradlew downloadDependencies
 
   build:
     needs:
@@ -113,7 +113,6 @@ jobs:
     env:
       DISABLE_COMPILATION: 'true'
     strategy:
-      fail-fast: true
       matrix:
         gradle-version: ${{ fromJSON(needs.build.outputs.gradle-versions) }}
     steps:
