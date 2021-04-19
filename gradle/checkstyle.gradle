@@ -40,11 +40,13 @@ allprojects {
         if (!(task instanceof Checkstyle)) return
         Checkstyle checkstyleTask = (Checkstyle) task
         File xmlFile = checkstyleTask.reports.xml.outputLocation.get().asFile
+        File xmlFileDir = file(xmlFile.parent)
         File destinationDir = file(
             "${rootProject.buildDir}/reports/checkstyle${checkstyleTask.project.path.replaceAll(/:/, '-')}"
+                .replaceFirst(/-$/, '')
         )
         if (xmlFile.isFile()) {
-            if (task.project !== rootProject) {
+            if (xmlFileDir != destinationDir) {
                 project.copy {
                     from(xmlFile)
                     into(destinationDir)
