@@ -1,39 +1,66 @@
-import build.IdeaCheckstyleConfigUpdater
-
 allprojects {
-    pluginManager.withPlugin('java') {
+    apply plugin: 'checkstyle'
 
-        apply plugin: 'checkstyle'
+    configurations.named('projectDependencyConstraints') { Configuration conf ->
+        conf.dependencyConstraints.addAll(
+            [
+                'com.puppycrawl.tools:checkstyle:8.41.1',
+            ].collect { project.dependencies.constraints.create(it) }
+        )
+    }
 
-        configurations.named('projectDependencyConstraints') { Configuration conf ->
-            conf.dependencyConstraints.addAll(
-                [
-                    'com.puppycrawl.tools:checkstyle:8.41.1',
-                ].collect { project.dependencies.constraints.create(it) }
-            )
-        }
+    checkstyle {
+        ignoreFailures = false
+        configDirectory = rootProject.projectDir
 
-        checkstyle {
-            configDirectory = rootProject.projectDir
+        toolVersion = project.configurations.checkstyle
+            .allDependencyConstraints
+            .matching { it.group == 'com.puppycrawl.tools' && it.name == 'checkstyle' }
+            .matching { it.version != null && !it.version.isEmpty() }
+            .first()
+            .version
+    }
 
-            toolVersion = project.configurations.checkstyle
-                .allDependencyConstraints
-                .matching { it.group == 'com.puppycrawl.tools' && it.name == 'checkstyle' }
-                .matching { it.version != null && !it.version.isEmpty() }
-                .first()
-                .version
-        }
+    tasks.withType(Checkstyle) { Checkstyle task ->
+        task.dependsOn(provider { task.classpath })
+    }
 
-        if (project == rootProject) {
-            tasks.maybeCreate('configureIdea').doLast {
-                File configFile = file("${rootProjectDir}/.idea/checkstyle-idea.xml")
-                if (!configFile.isFile()) {
-                    return
+    if (project == rootProject) {
+        tasks.maybeCreate('configureIdea').doLast {
+            File configFile = file("${rootProjectDir}/.idea/checkstyle-idea.xml")
+            if (!configFile.isFile()) {
+                return
+            }
+
+            String toolVersion = checkstyle.toolVersion
+            if (toolVersion == null || toolVersion.isBlank()) return
+
+            Class XmlParser = Class.forName('groovy.xml.XmlParser')
+            def xmlParser = XmlParser.getConstructor(Boolean.TYPE, Boolean.TYPE).newInstance(false, false)
+            def rootNode = xmlParser.parse(configFile)
+            def component = rootNode.component.find()
+            if (component?.attribute('name') != 'CheckStyle-IDEA') return
+
+            boolean isChanged = false
+            component.option?.map?.entry?.forEach { entry ->
+                if (entry.attribute('key') == 'checkstyle-version'
+                    && entry.attribute('value') != toolVersion
+                ) {
+                    entry.attributes()['value'] = toolVersion
+                    isChanged = true
                 }
+            }
 
-                IdeaCheckstyleConfigUpdater.updateSettings(configFile, checkstyle)
+            if (isChanged) {
+                StringWriter stringWriter = new StringWriter()
+                Class XmlNodePrinter = Class.forName('groovy.xml.XmlNodePrinter')
+                def xmlNodePrinter = XmlNodePrinter.getConstructor(PrintWriter, String)
+                    .newInstance(new PrintWriter(stringWriter), '  ')
+                xmlNodePrinter.print(rootNode)
+
+                String content = stringWriter.toString().trim()
+                configFile.setText(content, 'UTF-8')
             }
         }
-
     }
 }

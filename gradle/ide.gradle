@@ -33,30 +33,6 @@ idea.project {
 
 allprojects {
     pluginManager.withPlugin('java') {
-        afterEvaluate {
-            String projectAbsolutePathPrefix = project.projectDir.absolutePath.replace(File.separator, '/') + '/'
-            def getModulePath = { File srcDir ->
-                String absolutePath = srcDir.absolutePath.replace(File.separator, '/')
-                if (absolutePath.startsWith(projectAbsolutePathPrefix)) {
-                    return absolutePath.substring(projectAbsolutePathPrefix.length())
-                } else {
-                    return absolutePath
-                }
-            }
-
-            idea.module?.settings {
-                sourceSets.all { SourceSet sourceSet ->
-                    sourceSet.java.srcDirs.forEach { srcDir ->
-                        packagePrefix[getModulePath(srcDir)] = property('baseJavaPackage')
-                    }
-                }
-            }
-        }
-    }
-}
-
-allprojects {
-    pluginManager.withPlugin('java') {
         sourceSets.all {
             configurations[it.compileOnlyConfigurationName].canBeResolved = true
         }

@@ -47,8 +47,12 @@ allprojects {
             }
         }
 
-        if (property('disable-test')?.toString()?.toBoolean()) {
+        if (property('disable-tests')?.toString()?.toBoolean()) {
             tasks.matching { it instanceof AbstractTestTask }.all { disableTask(it) }
+        }
+
+        if (property('disable-verification')?.toString()?.toBoolean()) {
+            tasks.matching { it instanceof VerificationTask }.all { disableTask(it) }
         }
     }
 

@@ -12,7 +12,8 @@ allprojects {
     ext['gradle-api.version'] = getRootProperty('gradle-api.version', GradleVersion.current().version)
 
     ext['disable-compilation'] = getRootProperty('disable-compilation', 'false')
-    ext['disable-test'] = getRootProperty('disable-test', 'false')
+    ext['disable-tests'] = getRootProperty('disable-test', 'false')
+    ext['disable-verification'] = getRootProperty('disable-verification', 'false')
 
     File rootProjectDir = file(rootDir)
     if (rootProjectDir.name == 'buildSrc') rootProjectDir = rootProjectDir.parentFile

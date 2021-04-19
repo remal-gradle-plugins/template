@@ -150,3 +150,52 @@ jobs:
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
+
+  push-back:
+    if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+    needs:
+    - cross-versions-test
+    name: Push-back
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DISABLE_COMPILATION: 'true'
+      DISABLE_VERIFICATION: 'true'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 1
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        key: ${{runner.os}}-gradle-${{hashFiles('gradle/**', '**/*.gradle')}}
+        path: |
+          ~/.gradle
+    - name: Setup Java 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: zulu
+    - name: Download workspace archive
+      id: download-workspace
+      uses: actions/download-artifact@v2
+      with:
+        name: workspace
+        path: /tmp
+    - name: Unarchive workspace
+      run: |
+        tar -xzf "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
+    - name: Update IDEA settings
+      run: |
+        ./gradlew configureIdea
+    - name: Push back
+      env:
+        PUSH_BACK_TOKEN: ${{ secrets.PUSH_BACK_TOKEN }}
+      if: ${{ env.PUSH_BACK_TOKEN && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') }}
+      uses: remal-github-actions/push-back@v1
+      with:
+        githubToken: ${{ env.PUSH_BACK_TOKEN }}
+        message: '[push-back] Push-back updated files during build'
+
