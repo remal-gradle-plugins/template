@@ -21,12 +21,12 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 2
+    - name: Compile
+      run: |
+        ./gradlew allClasses
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
         languages: java
-    - name: Compile
-      run: |
-        ./gradlew allClasses
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
