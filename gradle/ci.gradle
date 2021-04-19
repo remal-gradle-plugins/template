@@ -54,6 +54,11 @@ allprojects {
         if (property('disable-verification')?.toString()?.toBoolean()) {
             tasks.matching { it instanceof VerificationTask }.all { disableTask(it) }
         }
+
+        if (property('disable-verification-except-tests')?.toString()?.toBoolean()) {
+            tasks.matching { it instanceof VerificationTask && !(it instanceof AbstractTestTask) }
+                .all { disableTask(it) }
+        }
     }
 
 }

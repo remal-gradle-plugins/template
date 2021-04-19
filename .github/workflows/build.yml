@@ -133,6 +133,7 @@ jobs:
     timeout-minutes: 120
     env:
       DISABLE_COMPILATION: 'true'
+      DISABLE_VERIFICATION_EXCEPT_TESTS: 'true'
     strategy:
       matrix:
         gradle-version: ${{fromJSON(needs.build.outputs.gradle-versions)}}

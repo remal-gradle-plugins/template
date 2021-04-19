@@ -14,6 +14,7 @@ allprojects {
     ext['disable-compilation'] = getRootProperty('disable-compilation', 'false')
     ext['disable-tests'] = getRootProperty('disable-test', 'false')
     ext['disable-verification'] = getRootProperty('disable-verification', 'false')
+    ext['disable-verification-except-tests'] = getRootProperty('disable-verification-except-tests', 'false')
 
 
     File rootProjectDir = file(rootDir)
