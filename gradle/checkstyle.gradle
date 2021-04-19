@@ -21,8 +21,18 @@ allprojects {
             .version
     }
 
-    tasks.withType(Checkstyle) { Checkstyle task ->
-        task.dependsOn(provider { task.classpath })
+    pluginManager.withPlugin('java') {
+        sourceSets.all { SourceSet sourceSet ->
+            tasks.withType(Checkstyle)
+                .matching { it.name == sourceSet.getTaskName('checkstyle', null) }
+                .configureEach { Checkstyle task ->
+                    task.dependsOn(sourceSet.output)
+                    task.dependsOn(sourceSet.compileClasspath)
+                    if (sourceSet.name == SourceSet.MAIN_SOURCE_SET_NAME) {
+                        task.dependsOn(sourceSet.jarTaskName)
+                    }
+                }
+        }
     }
 
     if (project == rootProject) {
