@@ -23,8 +23,6 @@ allprojects {
     version = '0-SNAPSHOT'
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 apply from: 'gradle/properties.gradle'
 apply from: 'gradle/ci.gradle'
 apply from: 'gradle/dependencies.gradle'
@@ -50,17 +48,17 @@ gradlePlugin {
     }
 }
 
-pluginBundle {
-    website = property('repository-html-url')
-    vcsUrl = property('repository-html-url')
-    description = property('repository-description')
-    tags = property('repository-topics').toString().split(',').collect()
-        .map { it.trim() }
+pluginBundle.with {
+    it.website = project.property('repository-html-url')
+    it.vcsUrl = project.property('repository-html-url')
+    it.description = project.property('repository-description')
+    it.tags = project.property('repository-topics').toString().split(',')
+        .collect { it.trim() }
         .findAll { !it.isEmpty() }
 
-    plugins {
+    it.plugins {
         templatePlugin {
-            displayName = property('repository-name')
+            displayName = project.property('repository-name')
         }
     }
 }
