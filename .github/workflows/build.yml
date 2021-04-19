@@ -102,7 +102,7 @@ jobs:
         done
     - name: Archive workspace
       run: |
-        tar -czv -f "/tmp/workspace-${{github.run_id}}.tar.gz" .
+        tar -czv -f "/tmp/workspace-${{github.run_id}}.tar.gz" `git ls-files -m -o -u`
     - name: Upload workspace archive
       uses: actions/upload-artifact@v2
       with:
