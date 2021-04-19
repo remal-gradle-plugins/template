@@ -97,6 +97,9 @@ jobs:
         for file in build/reports/checkstyle*/*.xml; do
           echo "::group::Processing $file"
           cat "$file" | reviewdog -name="checkstyle" -f=checkstyle -reporter=github-check
+          if [ "${{github.event}}" == "pull_request" ]; then
+            cat "$file" | reviewdog -name="checkstyle" -f=checkstyle -reporter=github-pr-check
+          fi
           echo "::endgroup::"
         done
     - name: Archive workspace
