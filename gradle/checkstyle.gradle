@@ -55,7 +55,13 @@ allprojects {
         } else {
             File destinationFile = new File(destinationDir, xmlFile.name)
             destinationFile.parentFile.mkdirs()
-            destinationFile.setText('<checkstyle/>', 'utf-8')
+            destinationFile.setText(
+                [
+                    '<?xml version="1.0" encoding="UTF-8"?>',
+                    '<checkstyle version="' + task.project.checkstyle.toolVersion + '"/>',
+                ].join('\n'),
+                'UTF-8'
+            )
         }
     }
 
