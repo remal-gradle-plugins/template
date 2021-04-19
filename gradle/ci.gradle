@@ -37,6 +37,17 @@ allprojects {
             }
         }
 
+        def isVerificationTask = { Task task ->
+            if (task instanceof VerificationTask) {
+                return true
+            }
+            if (task instanceof ValidatePlugins) {
+                return true
+            }
+            return false
+        }
+
+
         if (property('disable-compilation')?.toString()?.toBoolean()) {
             tasks.matching { it instanceof AbstractCompile }.all { disableTask(it) }
 
@@ -52,12 +63,11 @@ allprojects {
         }
 
         if (property('disable-verification')?.toString()?.toBoolean()) {
-            tasks.matching { it instanceof VerificationTask }.all { disableTask(it) }
+            tasks.matching { isVerificationTask(it) }.all { disableTask(it) }
         }
 
         if (property('disable-verification-except-tests')?.toString()?.toBoolean()) {
-            tasks.matching { it instanceof VerificationTask && !(it instanceof AbstractTestTask) }
-                .all { disableTask(it) }
+            tasks.matching { isVerificationTask(it) && !(it instanceof AbstractTestTask) }.all { disableTask(it) }
         }
     }
 

@@ -16,6 +16,11 @@ allprojects {
     ext['disable-verification'] = getRootProperty('disable-verification', 'false')
     ext['disable-verification-except-tests'] = getRootProperty('disable-verification-except-tests', 'false')
 
+    ext['repository-name'] = getRootProperty('repository-name', '')
+    ext['repository-html-url'] = getRootProperty('repository-html-url', '')
+    ext['repository-description'] = getRootProperty('repository-description', '')
+    ext['repository-topics'] = getRootProperty('repository-topics', '')
+
 
     File rootProjectDir = file(rootDir)
     if (rootProjectDir.name == 'buildSrc') rootProjectDir = rootProjectDir.parentFile

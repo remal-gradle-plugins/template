@@ -11,6 +11,11 @@ buildscript {
     }
 }
 
+plugins {
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.14.0'
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 allprojects {
@@ -21,17 +26,41 @@ allprojects {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 apply from: 'gradle/properties.gradle'
+apply from: 'gradle/ci.gradle'
 apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/java.gradle'
 apply from: 'gradle/groovy.gradle'
 apply from: 'gradle/checkstyle.gradle'
-apply from: 'gradle/ci.gradle'
 apply from: 'gradle/ide.gradle'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-apply plugin: 'java-library'
-
 dependencies {
-    compileOnly 'name.remal.gradle-api:gradle-api'
+    compileOnly 'com.gradle.publish:plugin-publish-plugin:0.14.0'
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+gradlePlugin {
+    plugins {
+        templatePlugin {
+            id = 'name.remal.template-plugin.v2'
+            implementationClass = 'name.remal.gradleplugins.template.v2.TemplatePlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = property('repository-html-url')
+    vcsUrl = property('repository-html-url')
+    description = property('repository-description')
+    tags = property('repository-topics').toString().split(',').collect()
+        .map { it.trim() }
+        .findAll { !it.isEmpty() }
+
+    plugins {
+        templatePlugin {
+            displayName = property('repository-name')
+        }
+    }
 }

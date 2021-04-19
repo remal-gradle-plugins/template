@@ -58,6 +58,7 @@ jobs:
     timeout-minutes: 30
     outputs:
       gradle-versions: ${{steps.gradle-versions.outputs.stableMinorAndLatestUnstable}}
+      repository-info: ${{steps.repository-info.outputs.result}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -75,6 +76,15 @@ jobs:
       with:
         java-version: 11
         distribution: zulu
+    - name: Retrieve repository info
+      id: repository-info
+      uses: remal-github-actions/retrieve-repository-info@v1
+    - name: Set environment variables
+      run: |
+        echo "REPOSITORY_NAME=${{fromJSON(steps.repository-info.outputs.result).name}}" >> $GITHUB_ENV
+        echo "REPOSITORY_HTML_URL=${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}" >> $GITHUB_ENV
+        echo "REPOSITORY_DESCRIPTION=${{fromJSON(steps.repository-info.outputs.result).description}}" >> $GITHUB_ENV
+        echo "REPOSITORY_TOPICS=${{fromJSON(steps.repository-info.outputs.result).topicsString}}" >> $GITHUB_ENV
     - name: Compile classes
       run: |
         ./gradlew allClasses

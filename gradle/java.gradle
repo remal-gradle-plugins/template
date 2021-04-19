@@ -11,7 +11,7 @@ allprojects {
 
         repositories {
             mavenCentral()
-            //gradlePluginPortal()
+            gradlePluginPortal()
 
             maven {
                 name = 'Gradle API'
@@ -118,6 +118,20 @@ allprojects {
                     }
                 }
             }
+        }
+    }
+
+    pluginManager.withPlugin('java-gradle-plugin') {
+        afterEvaluate {
+            configurations.all { Configuration conf ->
+                conf.dependencies.removeIf { it instanceof SelfResolvingDependency }
+            }
+        }
+
+        dependencies {
+            compileOnly 'name.remal.gradle-api:gradle-api'
+            testImplementation 'name.remal.gradle-api:gradle-api'
+            testImplementation 'name.remal.gradle-api:gradle-test-kit'
         }
     }
 }
