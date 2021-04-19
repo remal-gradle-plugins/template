@@ -135,6 +135,7 @@ jobs:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION_EXCEPT_TESTS: 'true'
     strategy:
+      fail-fast: false
       matrix:
         gradle-version: ${{fromJSON(needs.build.outputs.gradle-versions)}}
     steps:
