@@ -1,0 +1,12 @@
+apply from: '../gradle/properties.gradle'
+apply from: '../gradle/dependencies.gradle'
+apply from: '../gradle/java.gradle'
+apply from: '../gradle/groovy.gradle'
+
+allprojects {
+    pluginManager.withPlugin('java') {
+        sourceSets.all {
+            configurations[it.compileOnlyConfigurationName].canBeResolved = true
+        }
+    }
+}

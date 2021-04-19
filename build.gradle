@@ -12,8 +12,18 @@ buildscript {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+allprojects {
+    group = 'name.remal.gradle-plugins'
+    version = '0-SNAPSHOT'
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 apply from: 'gradle/properties.gradle'
+apply from: 'gradle/dependencies.gradle'
 apply from: 'gradle/java.gradle'
+apply from: 'gradle/groovy.gradle'
+apply from: 'gradle/checkstyle.gradle'
 apply from: 'gradle/ci.gradle'
 apply from: 'gradle/ide.gradle'
 

@@ -18,10 +18,11 @@ build-cache/
 # Intellij
 /.idea/*
 !/.idea/.editorconfig
-!/.idea/misc.xml
+!/.idea/checkstyle-idea.xml
+!/.idea/externalDependencies.xml
 !/.idea/groovyc.xml
 !/.idea/jsonSchemas.xml
-!/.idea/externalDependencies.xml
+!/.idea/misc.xml
 !/.idea/saveactions_settings.xml
 !/.idea/inspectionProfiles/
 !/.idea/inspectionProfiles/*

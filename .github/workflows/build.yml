@@ -111,7 +111,6 @@ jobs:
         min: ${{steps.min-gradle-version.outputs.value}}
 
   cross-versions-test:
-    if: ${{needs.build.outputs.gradle-versions != '[""]'}}
     needs:
     - build
     name: Cross Gradle versions test
@@ -140,13 +139,14 @@ jobs:
         java-version: 11
         distribution: zulu
     - name: Download workspace archive
+      id: download-workspace
       uses: actions/download-artifact@v2
       with:
         name: workspace
-        path: /tmp/
+        path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xzf "/tmp/workspace-${{github.run_id}}.tar.gz"
+        tar -xzf "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"

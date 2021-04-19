@@ -1,0 +1,39 @@
+import build.IdeaCheckstyleConfigUpdater
+
+allprojects {
+    pluginManager.withPlugin('java') {
+
+        apply plugin: 'checkstyle'
+
+        configurations.named('projectDependencyConstraints') { Configuration conf ->
+            conf.dependencyConstraints.addAll(
+                [
+                    'com.puppycrawl.tools:checkstyle:8.41.1',
+                ].collect { project.dependencies.constraints.create(it) }
+            )
+        }
+
+        checkstyle {
+            configDirectory = rootProject.projectDir
+
+            toolVersion = project.configurations.checkstyle
+                .allDependencyConstraints
+                .matching { it.group == 'com.puppycrawl.tools' && it.name == 'checkstyle' }
+                .matching { it.version != null && !it.version.isEmpty() }
+                .first()
+                .version
+        }
+
+        if (project == rootProject) {
+            tasks.maybeCreate('configureIdea').doLast {
+                File configFile = file("${rootProjectDir}/.idea/checkstyle-idea.xml")
+                if (!configFile.isFile()) {
+                    return
+                }
+
+                IdeaCheckstyleConfigUpdater.updateSettings(configFile, checkstyle)
+            }
+        }
+
+    }
+}

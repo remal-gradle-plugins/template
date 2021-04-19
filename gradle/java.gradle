@@ -30,7 +30,7 @@ allprojects {
             }
         }
 
-        configurations.create('projectDependencyConstraints') { Configuration conf ->
+        configurations.named('projectDependencyConstraints') { Configuration conf ->
             String mockitoVersion = '3.9.0'
 
             conf.dependencies.addAll(
@@ -52,13 +52,6 @@ allprojects {
                     "org.mockito:mockito-junit-jupiter:$mockitoVersion",
                 ].collect { project.dependencies.constraints.create(it) }
             )
-
-            conf.extendsFrom = []
-            conf.visible = false
-            conf.canBeConsumed = false
-            conf.canBeResolved = false
-
-            configurations.matching { it != conf }.configureEach { extendsFrom(conf) }
         }
 
         dependencies {

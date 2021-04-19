@@ -14,7 +14,11 @@ allprojects {
     ext['disable-compilation'] = getRootProperty('disable-compilation', 'false')
     ext['disable-test'] = getRootProperty('disable-test', 'false')
 
-    ext['baseJavaPackage'] = "name.remal.gradle-plugins.${rootProject.name}${project.path}"
+    File rootProjectDir = file(rootDir)
+    if (rootProjectDir.name == 'buildSrc') rootProjectDir = rootProjectDir.parentFile
+    ext['rootProjectDir'] = rootProjectDir
+
+    ext['baseJavaPackage'] = "${rootProject.group}.${rootProject.name}${project.path}"
         .replace('-', '')
         .replace(':', '.')
         .replaceFirst(/\.+$/, '')
