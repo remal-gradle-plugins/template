@@ -25,7 +25,6 @@ jobs:
       || (github.event_name == 'push' && !startsWith(github.event.head_commit.message, '[skip ci]') && !startsWith(github.event.head_commit.message, '[push-back]'))
       || github.event_name != 'push'
       }}
-    name: Populate cache
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -55,7 +54,6 @@ jobs:
   build:
     needs:
     - populate-cache
-    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -131,7 +129,6 @@ jobs:
   cross-versions-test:
     needs:
     - build
-    name: Cross Gradle versions test
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -173,7 +170,6 @@ jobs:
     if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
     needs:
     - cross-versions-test
-    name: Push-back
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
