@@ -102,7 +102,7 @@ jobs:
         done
     - name: Archive workspace
       run: |
-        tar -czfv "/tmp/workspace-${{github.run_id}}.tar.gz" .
+        tar -czv -f "/tmp/workspace-${{github.run_id}}.tar.gz" .
     - name: Upload workspace archive
       uses: actions/upload-artifact@v2
       with:
@@ -161,7 +161,7 @@ jobs:
         path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xzfv "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xzv -f "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
@@ -200,7 +200,7 @@ jobs:
         path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xzfv "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xzv -f "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Update IDEA settings
       run: |
         ./gradlew configureIdea
