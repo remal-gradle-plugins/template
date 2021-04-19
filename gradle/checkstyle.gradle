@@ -35,6 +35,22 @@ allprojects {
         }
     }
 
+    tasks.withType(Checkstyle) { onlyIf { reports.xml.enabled = true; return true } }
+    project.gradle.taskGraph.afterTask { Task task ->
+        if (!(task instanceof Checkstyle)) return
+        if (task.project === rootProject) return
+        Checkstyle checkstyleTask = (Checkstyle) task
+        File xmlFile = checkstyleTask.reports.xml.outputLocation.get().asFile
+        File destinationDir = file(
+            "${rootProject.buildDir}/reports/checkstyle${checkstyleTask.project.path.replaceAll(/:/, '-')}"
+        )
+        project.copy {
+            from(xmlFile)
+            into(destinationDir)
+        }
+    }
+
+
     if (project == rootProject) {
         tasks.maybeCreate('configureIdea').doLast {
             File configFile = file("${rootProjectDir}/.idea/checkstyle-idea.xml")

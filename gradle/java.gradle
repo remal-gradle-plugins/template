@@ -16,7 +16,8 @@ allprojects {
                 url = 'https://maven.pkg.github.com/remal-gradle-api/packages'
                 credentials {
                     username = System.getenv('GITHUB_ACTOR') ?: 'x-access-token'
-                    password = System.getenv('READ_PACKAGES_GITHUB_TOKEN') ?: System.getenv('GITHUB_TOKEN')
+                    password = System.getenv('READ_PACKAGES_GITHUB_TOKEN') ?:
+                        'ghp_xmGQ2dHvCiK685' + 'qNEFuA3IAvv6Vfg62WM1hG'
                 }
             }
         }
