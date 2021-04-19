@@ -1,7 +1,7 @@
 allprojects {
     pluginManager.withPlugin('groovy') {
         tasks.withType(GroovyCompile).configureEach {
-            it.groovyOptions.with {
+            groovyOptions.with {
                 it.fork = false
                 it.parameters = true
                 it.configurationScript = project.file("${rootProjectDir}/compiler-config.groovy")

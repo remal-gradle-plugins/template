@@ -21,7 +21,7 @@ allprojects {
     if (rootProjectDir.name == 'buildSrc') rootProjectDir = rootProjectDir.parentFile
     ext['rootProjectDir'] = rootProjectDir
 
-    ext['baseJavaPackage'] = "${rootProject.group}.${rootProject.name}${project.path}"
+    ext['baseJavaPackage'] = "${rootProject.group}.${rootProject.name}.v2${project.path}"
         .replace('-', '')
         .replace(':', '.')
         .replaceFirst(/\.+$/, '')

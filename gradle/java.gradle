@@ -4,6 +4,8 @@ import java.util.concurrent.ConcurrentMap
 allprojects {
     pluginManager.withPlugin('java') {
 
+        apply plugin: 'name.remal.insert-null-checks'
+
         sourceCompatibility = JavaVersion.VERSION_1_8.toString()
         targetCompatibility = sourceCompatibility.toString()
 
@@ -66,15 +68,21 @@ allprojects {
 
 
         tasks.withType(JavaCompile) {
-            options.compilerArgs.addAll(
-                [
-                    '-Werror',
-                    '-Xlint:all',
-                    '-Xlint:-rawtypes',
-                    '-Xlint:-serial',
-                    '-Xlint:-processing',
-                ]
-            )
+            options.with {
+                it.fork = false
+                it.encoding = 'UTF-8'
+                it.deprecation = true
+                it.compilerArgs.addAll(
+                    [
+                        '-parameters',
+                        '-Werror',
+                        '-Xlint:all',
+                        '-Xlint:-rawtypes',
+                        '-Xlint:-serial',
+                        '-Xlint:-processing',
+                    ]
+                )
+            }
         }
 
         tasks.matching { it instanceof JavaForkOptions }.all {
