@@ -135,6 +135,7 @@ jobs:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION_EXCEPT_TESTS: 'true'
     strategy:
+      max-parallel: 4
       matrix:
         gradle-version: ${{fromJSON(needs.build.outputs.gradle-versions)}}
     steps:
@@ -166,6 +167,14 @@ jobs:
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
+
+  cross-versions-test-success:
+    needs:
+    - cross-versions-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - run: |
 
   push-back:
     if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
