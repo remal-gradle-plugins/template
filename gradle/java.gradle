@@ -124,7 +124,9 @@ allprojects {
     pluginManager.withPlugin('java-gradle-plugin') {
         afterEvaluate {
             configurations.all { Configuration conf ->
-                conf.dependencies.removeIf { it instanceof SelfResolvingDependency }
+                conf.dependencies.removeIf {
+                    it instanceof SelfResolvingDependency && it.files.toString() != 'file collection'
+                }
             }
         }
 

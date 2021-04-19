@@ -34,7 +34,7 @@ apply from: 'gradle/ide.gradle'
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 dependencies {
-    compileOnly 'com.gradle.publish:plugin-publish-plugin:0.14.0'
+    //compileOnly 'com.gradle.publish:plugin-publish-plugin:0.14.0'
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -49,16 +49,16 @@ gradlePlugin {
 }
 
 pluginBundle.with {
-    it.website = project.property('repository-html-url')
-    it.vcsUrl = project.property('repository-html-url')
-    it.description = project.property('repository-description')
-    it.tags = project.property('repository-topics').toString().split(',')
+    it.website = property('repository-html-url') // FIXME: use real website URL here
+    it.vcsUrl = property('repository-html-url')
+    it.description = property('repository-description') // FIXME: use real description here
+    it.tags = property('repository-topics').toString().split(',')
         .collect { it.trim() }
         .findAll { !it.isEmpty() }
 
     it.plugins {
         templatePlugin {
-            displayName = project.property('repository-name')
+            displayName = property('repository-description') // FIXME: use real name here
         }
     }
 }
