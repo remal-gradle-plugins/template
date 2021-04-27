@@ -61,12 +61,7 @@ allprojects {
                 List<String> apiDeps = apiConf.allDependencies
                     .findAll { it instanceof ExternalModuleDependency }
                     .findAll { !(it instanceof ClientModule) }
-                    .findAll {
-                        if (it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) != null) {
-                            return false
-                        }
-                        return true
-                    }
+                    .findAll { it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) == null }
                     .collect { "${it.group}:${it.name}" }
                 if (apiDeps.isEmpty()) return
 
