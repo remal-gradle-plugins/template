@@ -11,7 +11,7 @@ allprojects {
 
     checkstyle {
         ignoreFailures = false
-        configDirectory = rootProject.projectDir
+        configFile = rootProject.file('checkstyle.xml')
 
         toolVersion = project.configurations.checkstyle
             .allDependencyConstraints
@@ -19,22 +19,6 @@ allprojects {
             .matching { it.version != null && !it.version.isEmpty() }
             .first()
             .version
-    }
-
-    afterEvaluate {
-        pluginManager.withPlugin('java') {
-            sourceSets.all { SourceSet sourceSet ->
-                tasks.withType(Checkstyle)
-                    .matching { it.name == sourceSet.getTaskName('checkstyle', null) }
-                    .configureEach { Checkstyle task ->
-                        task.dependsOn(sourceSet.output)
-                        task.dependsOn(sourceSet.compileClasspath)
-                        if (sourceSet.name == SourceSet.MAIN_SOURCE_SET_NAME) {
-                            task.dependsOn(sourceSet.jarTaskName)
-                        }
-                    }
-            }
-        }
     }
 
 
