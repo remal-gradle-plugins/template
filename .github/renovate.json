@@ -11,8 +11,7 @@
     {
       "description": [
         "plugin-api",
-        ":",
-        "Plugin API dependencies for ':' Gradle project"
+        ":"
       ],
       "packageNames": [
         "com.google.guava:guava"
