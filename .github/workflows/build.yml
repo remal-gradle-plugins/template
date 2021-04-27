@@ -97,7 +97,7 @@ jobs:
         ./gradlew build -Pdisable-test=true
     - name: Archive workspace
       run: |
-        tar -cz -f "/tmp/workspace-${{github.run_id}}.tar.gz" `git ls-files -m -o -u`
+        tar -cz -f "/tmp/workspace-${{github.run_id}}.tar.gz" `git ls-files -m -o`
     - name: Upload workspace archive
       uses: actions/upload-artifact@v2
       with:
