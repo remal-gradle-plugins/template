@@ -1,5 +1,7 @@
 allprojects {
 
+    gradle.startParameter.showStacktrace = 'ALWAYS'
+
     tasks.create('downloadDependencies') {
         doLast {
             project.configurations
