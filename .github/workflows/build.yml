@@ -58,7 +58,10 @@ jobs:
     timeout-minutes: 30
     outputs:
       gradle-versions: ${{steps.gradle-versions.outputs.unstableMinors}}
-      repository-info: ${{steps.repository-info.outputs.result}}
+      repository-htmlUrl: ${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}
+      repository-description: ${{fromJSON(steps.repository-info.outputs.result).description}}
+      repository-topicsString: ${{fromJSON(steps.repository-info.outputs.result).topicsString}}
+      repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -84,6 +87,7 @@ jobs:
         echo "REPOSITORY_HTML_URL=${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}" >> "$GITHUB_ENV"
         echo "REPOSITORY_DESCRIPTION=${{fromJSON(steps.repository-info.outputs.result).description}}" >> "$GITHUB_ENV"
         echo "REPOSITORY_TOPICS=${{fromJSON(steps.repository-info.outputs.result).topicsString}}" >> "$GITHUB_ENV"
+        echo "REPOSITORY_IS_TEMPLATE=${{fromJSON(steps.repository-info.outputs.result).isTemplate}}" >> "$GITHUB_ENV"
     - name: Compile classes
       run: |
         ./gradlew allClasses
