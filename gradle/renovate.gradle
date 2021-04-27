@@ -63,26 +63,13 @@ allprojects {
                     .findAll { !(it instanceof ClientModule) }
                     .findAll { it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) == null }
                     .collect { "${it.group}:${it.name}" }
+                if (apiDeps.isEmpty()) return
 
                 def packageRules = settings.packageRules
                 if (!(packageRules instanceof List)) {
                     packageRules = []
+                    settings.packageRules = packageRules
                 }
-
-                apiDeps.removeIf { String apiDep ->
-                    return packageRules.any { rule ->
-                        if (rule.description instanceof List
-                            && rule.description.size() >= 2
-                            && rule.description[0] == 'plugin-api'
-                        ) {
-                            if (rule.packageNames instanceof Collection) {
-                                return rule.packageNames.contains(apiDep)
-                            }
-                        }
-                        return false
-                    }
-                }
-                if (apiDeps.isEmpty()) return
 
                 packageRules.add(
                     [
@@ -95,8 +82,6 @@ allprojects {
                         'commitMessageTopic': "plugin API dependency {{depName}}"
                     ]
                 )
-
-                settings.packageRules = packageRules
             }
         }
     }
