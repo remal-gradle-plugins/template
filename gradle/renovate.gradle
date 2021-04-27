@@ -77,13 +77,13 @@ allprojects {
 
                 packageRules.add(
                     [
-                        'description' : [
+                        'description'       : [
                             'plugin-api',
                             project.path,
                             "Plugin API dependencies for '${project.path}' Gradle project"
                         ],
-                        'packageNames': apiDeps,
-                        'labels'      : ['plugin-api-dependency']
+                        'packageNames'      : apiDeps,
+                        'commitMessageTopic': "plugin API dependency"
                     ]
                 )
 

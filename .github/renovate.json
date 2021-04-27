@@ -17,9 +17,8 @@
       "packageNames": [
         "com.google.guava:guava"
       ],
-      "labels": [
-        "plugin-api-dependency"
-      ]
+      "commitMessageTopic": "plugin API dependency"
+
     }
   ]
 }
