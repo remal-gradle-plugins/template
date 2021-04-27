@@ -29,12 +29,14 @@ apply from: 'gradle/gradle-plugin.gradle'
 apply from: 'gradle/major-version.gradle'
 apply from: 'gradle/publish-gradle-plugin.gradle'
 apply from: 'gradle/ide.gradle'
+apply from: 'gradle/renovate.gradle'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 apply plugin: 'java-gradle-plugin'
 
 dependencies {
+    api 'com.google.guava:guava:30.1-jre'
 }
 
 gradlePlugin {
