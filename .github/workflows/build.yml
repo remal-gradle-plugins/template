@@ -57,11 +57,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
-      gradle-versions: ${{steps.gradle-versions.outputs.unstableMinors}}
-      repository-htmlUrl: ${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}
-      repository-description: ${{fromJSON(steps.repository-info.outputs.result).description}}
-      repository-topicsString: ${{fromJSON(steps.repository-info.outputs.result).topicsString}}
       repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
+      gradle-versions: ${{steps.gradle-versions.outputs.unstableMinors}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -82,7 +79,7 @@ jobs:
     - name: Retrieve repository info
       id: repository-info
       uses: remal-github-actions/retrieve-repository-info@v1
-    - name: Set environment variables
+    - name: Set repository info environment variables
       run: |
         echo "REPOSITORY_HTML_URL=${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}" >> "$GITHUB_ENV"
         echo "REPOSITORY_DESCRIPTION=${{fromJSON(steps.repository-info.outputs.result).description}}" >> "$GITHUB_ENV"
