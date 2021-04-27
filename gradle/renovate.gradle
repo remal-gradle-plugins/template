@@ -62,11 +62,7 @@ allprojects {
                     .findAll { it instanceof ExternalModuleDependency }
                     .findAll { !(it instanceof ClientModule) }
                     .findAll {
-                        Category platformCategory = objects.named(Category.class, Category.REGULAR_PLATFORM)
-                        Category enforcedPlatformCategory = objects.named(Category.class, Category.ENFORCED_PLATFORM)
-                        if (it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) == platformCategory
-                            || it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) == enforcedPlatformCategory
-                        ) {
+                        if (it.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE) != null) {
                             return false
                         }
                         return true
