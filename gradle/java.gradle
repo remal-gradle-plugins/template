@@ -3,7 +3,6 @@ import java.util.concurrent.ConcurrentMap
 
 allprojects {
     pluginManager.withPlugin('java') {
-
         apply plugin: 'name.remal.insert-null-checks'
 
         sourceCompatibility = JavaVersion.VERSION_1_8.toString()

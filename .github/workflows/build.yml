@@ -91,24 +91,6 @@ jobs:
     - name: Build
       run: |
         ./gradlew build -Pdisable-test=true
-    - name: Setup Reviewdog
-      if: ${{always()}}
-      uses: reviewdog/action-setup@v1
-      with:
-        reviewdog_version: latest
-    - name: Execute Reviewdog
-      if: ${{always()}}
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        for file in build/reports/checkstyle*/*.xml; do
-          echo "::group::Processing $file"
-          cat "$file" | reviewdog -name="checkstyle" -f=checkstyle -reporter=github-check
-          if [ "${{github.event_name}}" == "pull_request" ]; then
-            cat "$file" | reviewdog -name="checkstyle" -f=checkstyle -reporter=github-pr-check
-          fi
-          echo "::endgroup::"
-        done
     - name: Archive workspace
       run: |
         tar -cz -f "/tmp/workspace-${{github.run_id}}.tar.gz" `git ls-files -m -o -u`

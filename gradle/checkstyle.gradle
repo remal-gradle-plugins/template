@@ -37,36 +37,6 @@ allprojects {
         }
     }
 
-    afterEvaluate { tasks.withType(Checkstyle) { reports.xml.enabled = true } }
-    project.gradle.taskGraph.afterTask { Task task ->
-        if (!(task instanceof Checkstyle)) return
-        Checkstyle checkstyleTask = (Checkstyle) task
-        File xmlFile = checkstyleTask.reports.xml.outputLocation.get().asFile
-        File xmlFileDir = file(xmlFile.parent)
-        File destinationDir = file(
-            "${rootProject.buildDir}/reports/checkstyle${checkstyleTask.project.path.replaceAll(/:/, '-')}"
-                .replaceFirst(/-$/, '')
-        )
-        if (xmlFile.isFile()) {
-            if (xmlFileDir != destinationDir) {
-                project.copy {
-                    from(xmlFile)
-                    into(destinationDir)
-                }
-            }
-        } else {
-            File destinationFile = new File(destinationDir, xmlFile.name)
-            destinationFile.parentFile.mkdirs()
-            destinationFile.setText(
-                [
-                    '<?xml version="1.0" encoding="UTF-8"?>',
-                    '<checkstyle version="' + task.project.checkstyle.toolVersion + '"/>',
-                ].join('\n'),
-                'UTF-8'
-            )
-        }
-    }
-
 
     if (project == rootProject) {
         tasks.maybeCreate('configureIdea').doLast {
