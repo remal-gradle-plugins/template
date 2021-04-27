@@ -106,7 +106,7 @@ jobs:
       with:
         file: gradle.properties
         property: 'gradle-api.min-version'
-    - name: Retrieve Gradle versions
+    - name: Retrieve Gradle versions for testing
       id: gradle-versions
       uses: remal-github-actions/retrieve-maven-artifact-versions@v1
       with:
@@ -117,7 +117,18 @@ jobs:
         password: ${{github.token}}
         min: ${{steps.min-gradle-version.outputs.value}}
 
-  cross-versions-test:
+  echo:
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      OUTPUT: ${{needs.build.outputs.gradle-versions}}
+    steps:
+    - run: |
+        echo "$OUTPUT"
+
+  cross-versions-tests:
     needs:
     - build
     runs-on: ubuntu-latest
@@ -159,18 +170,19 @@ jobs:
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
 
-  cross-versions-test-success:
+  cross-versions-tests-success:
     needs:
-    - cross-versions-test
+    - cross-versions-tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
     - run: |
+        echo "All cross versions tests executed successfully"
 
   push-back:
     if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
     needs:
-    - cross-versions-test
+    - cross-versions-tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
