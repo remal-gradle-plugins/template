@@ -83,7 +83,7 @@ allprojects {
                             "Plugin API dependencies for '${project.path}' Gradle project"
                         ],
                         'packageNames'      : apiDeps,
-                        'commitMessageTopic': "plugin API dependency"
+                        'commitMessageTopic': "plugin API dependency {{depName}}"
                     ]
                 )
 
