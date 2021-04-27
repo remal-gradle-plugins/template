@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
-      gradle-versions: ${{steps.gradle-versions.outputs.unstableMinor}}
+      gradle-versions: ${{steps.gradle-versions.outputs.unstableMinors}}
       repository-info: ${{steps.repository-info.outputs.result}}
     steps:
     - name: Checkout repository
