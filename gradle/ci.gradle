@@ -40,6 +40,9 @@ allprojects {
         }
 
         def isVerificationTask = { Task task ->
+            if (task instanceof AbstractTestTask) {
+                return true
+            }
             if (task instanceof VerificationTask) {
                 return true
             }

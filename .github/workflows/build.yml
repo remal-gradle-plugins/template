@@ -166,10 +166,10 @@ jobs:
     - cross-versions-tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
-  #    steps:
-  #    - name: Display success message
-  #      run: |
-  #        echo "All cross versions tests executed successfully"
+    steps:
+    - name: Display success message
+      run: |
+        echo "All cross versions tests executed successfully"
 
   push-back:
     if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
@@ -214,9 +214,77 @@ jobs:
         ./gradlew configureIdea
     - name: Push back
       env:
-        PUSH_BACK_TOKEN: ${{ secrets.PUSH_BACK_TOKEN }}
-      if: ${{ env.PUSH_BACK_TOKEN && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') }}
+        PUSH_BACK_TOKEN: ${{secrets.PUSH_BACK_TOKEN}}
+      if: ${{env.PUSH_BACK_TOKEN && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')}}
       uses: remal-github-actions/push-back@v1
       with:
-        githubToken: ${{ env.PUSH_BACK_TOKEN }}
+        githubToken: ${{env.PUSH_BACK_TOKEN}}
         message: '[push-back] Push-back updated files during build'
+
+  evaluate-publish-conditions:
+    if: >-
+      ${{
+        github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        && ${{fromJSON(needs.build.outputs.repository-isTemplate) != true
+      }}
+    name: Publish to Gradle plugin portal
+    needs:
+    - build
+    - cross-versions-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Display success message
+      run: |
+        echo "All publish conditions evaluated successfully"
+
+  publish-to-gradle-plugins-portal:
+    name: Publish to Gradle plugin portal
+    needs:
+    - evaluate-publish-conditions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DISABLE_COMPILATION: 'true'
+      DISABLE_VERIFICATION: 'true'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 2
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        key: ${{runner.os}}-gradle-${{hashFiles('gradle/**', '**/*.gradle')}}
+        path: |
+          ~/.gradle
+    - name: Setup Java 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: zulu
+    - name: Download workspace archive
+      id: download-workspace
+      uses: actions/download-artifact@v2
+      with:
+        name: workspace
+        path: /tmp
+    - name: Unarchive workspace
+      run: |
+        tar -xz -f "${{steps.download-workspace.outputs.download-path}}/workspace-${{github.run_id}}.tar.gz"
+    - name: Execute tests
+      run: |
+        ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
+    - name: Retrieve repository info
+      id: repository-info
+      uses: remal-github-actions/retrieve-repository-info@v1
+    - name: Set repository info environment variables
+      run: |
+        echo "REPOSITORY_HTML_URL=${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}" >> "$GITHUB_ENV"
+        echo "REPOSITORY_DESCRIPTION=${{fromJSON(steps.repository-info.outputs.result).description}}" >> "$GITHUB_ENV"
+        echo "REPOSITORY_TOPICS=${{fromJSON(steps.repository-info.outputs.result).topicsString}}" >> "$GITHUB_ENV"
+        echo "REPOSITORY_IS_TEMPLATE=${{fromJSON(steps.repository-info.outputs.result).isTemplate}}" >> "$GITHUB_ENV"
+    - name: Publish to Gradle plugin portal
+      run: |
+        ./gradlew publishPlugins "-Pgradle.publish.key=${{secrets.GRADLE_PLUGINS_PORTAL_KEY}}" "-Pgradle.publish.secret=${{secrets.GRADLE_PLUGINS_PORTAL_SECRET}}"
