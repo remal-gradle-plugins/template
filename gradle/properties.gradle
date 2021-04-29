@@ -1,7 +1,7 @@
 import org.gradle.util.GradleVersion
 
 allprojects {
-    File ciPropertiesFile = rootProject.file('gradle-ci.properties')
+    File ciPropertiesFile = rootProject.file("${rootProject.buildDir}/gradle-ci.properties")
     synchronized (rootProject) {
         if (!rootProject.hasProperty('ciProperties')) {
             Properties props = new Properties()
