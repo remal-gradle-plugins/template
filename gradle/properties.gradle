@@ -39,25 +39,16 @@ allprojects {
     }
 
     ext['gradle-api.version'] = getCiProperty('gradle-api.version', GradleVersion.current().version)
-    println ext['gradle-api.version']
 
     ext['disable-compilation'] = getCiProperty('disable-compilation', 'false')
-    println ext['disable-compilation']
     ext['disable-tests'] = getCiProperty('disable-test', 'false')
-    println ext['disable-tests']
     ext['disable-verification'] = getCiProperty('disable-verification', 'false')
-    println ext['disable-verification']
     ext['disable-verification-except-tests'] = getCiProperty('disable-verification-except-tests', 'false')
-    println ext['disable-verification-except-tests']
 
     ext['repository-html-url'] = getCiProperty('repository-html-url', '')
-    println ext['repository-html-url']
     ext['repository-description'] = getCiProperty('repository-description', '')
-    println ext['repository-description']
     ext['repository-topics'] = getCiProperty('repository-topics', '')
-    println ext['repository-topics']
     ext['repository-is-template'] = getCiProperty('repository-is-template', '')
-    println ext['repository-is-template']
 
 
     File rootProjectDir = file(rootDir)
