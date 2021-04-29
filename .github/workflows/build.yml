@@ -225,7 +225,7 @@ jobs:
     if: >-
       ${{
         github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        && ${{fromJSON(needs.build.outputs.repository-isTemplate) != true
+        && fromJSON(needs.build.outputs.repository-isTemplate) != true
       }}
     name: Publish to Gradle plugin portal
     needs:
