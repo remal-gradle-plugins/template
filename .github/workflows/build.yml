@@ -274,15 +274,6 @@ jobs:
     - name: Execute tests
       run: |
         ./gradlew allTests "-Pgradle-api.version=${{matrix.gradle-version}}"
-    - name: Retrieve repository info
-      id: repository-info
-      uses: remal-github-actions/retrieve-repository-info@v1
-    - name: Set repository info environment variables
-      run: |
-        echo "REPOSITORY_HTML_URL=${{fromJSON(steps.repository-info.outputs.result).htmlUrl}}" >> "$GITHUB_ENV"
-        echo "REPOSITORY_DESCRIPTION=${{fromJSON(steps.repository-info.outputs.result).description}}" >> "$GITHUB_ENV"
-        echo "REPOSITORY_TOPICS=${{fromJSON(steps.repository-info.outputs.result).topicsString}}" >> "$GITHUB_ENV"
-        echo "REPOSITORY_IS_TEMPLATE=${{fromJSON(steps.repository-info.outputs.result).isTemplate}}" >> "$GITHUB_ENV"
     - name: Publish to Gradle plugin portal
       run: |
         ./gradlew publishPlugins "-Pgradle.publish.key=${{secrets.GRADLE_PLUGINS_PORTAL_KEY}}" "-Pgradle.publish.secret=${{secrets.GRADLE_PLUGINS_PORTAL_SECRET}}"

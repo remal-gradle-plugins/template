@@ -1,3 +1,5 @@
+/gradle-ci.properties
+
 log/
 *.log
 hs_err_pid*
