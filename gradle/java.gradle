@@ -43,6 +43,10 @@ allprojects {
 
             conf.dependencyConstraints.addAll(
                 [
+                    // Static analysis
+                    'com.google.code.findbugs:jsr305:3.0.2',
+                    'org.jetbrains:annotations:20.1.0',
+
                     // Compile
                     "name.remal.gradle-api:local-groovy:${property('gradle-api.version')}",
                     "name.remal.gradle-api:gradle-api:${property('gradle-api.version')}",
@@ -57,10 +61,15 @@ allprojects {
         }
 
         dependencies {
+            compileOnly 'com.google.code.findbugs:jsr305'
+            compileOnly 'org.jetbrains:annotations'
+
             testImplementation 'org.junit.jupiter:junit-jupiter-api'
             testImplementation 'org.junit.jupiter:junit-jupiter-params'
             testImplementation 'org.mockito:mockito-junit-jupiter'
             testImplementation 'org.mockito:mockito-inline'
+            testImplementation 'com.google.code.findbugs:jsr305'
+            testImplementation 'org.jetbrains:annotations'
 
             testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
         }
