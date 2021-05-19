@@ -1,4 +1,4 @@
-package name.remal.gradleplugins.template.v2;
+package name.remal.gradleplugins.template;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;

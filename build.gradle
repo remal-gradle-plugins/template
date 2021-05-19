@@ -26,7 +26,7 @@ apply from: 'gradle/java.gradle'
 apply from: 'gradle/groovy.gradle'
 apply from: 'gradle/checkstyle.gradle'
 apply from: 'gradle/gradle-plugin.gradle'
-apply from: 'gradle/major-version.gradle'
+apply from: 'gradle/base-package.gradle'
 apply from: 'gradle/publish-gradle-plugin.gradle'
 apply from: 'gradle/ide.gradle'
 apply from: 'gradle/renovate.gradle'
@@ -41,8 +41,8 @@ dependencies {
 gradlePlugin {
     plugins {
         'name.remal.template-plugin.v2' {
-            id = 'name.remal.template-plugin.v2'
-            implementationClass = 'name.remal.gradleplugins.template.v2.TemplatePlugin'
+            id = 'name.remal.template-plugin'
+            implementationClass = 'name.remal.gradleplugins.template.TemplatePlugin'
             displayName = 'Template plugin'
             description = property('repository-description')
         }
