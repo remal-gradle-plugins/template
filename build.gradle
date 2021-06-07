@@ -16,7 +16,8 @@ buildscript {
 
 allprojects {
     group = "name.remal.gradle-plugins.${rootProject.name}"
-    version = '2-SNAPSHOT'
+    //version = '2-SNAPSHOT'
+    version = '2'
 }
 
 apply from: 'gradle/properties.gradle'
@@ -27,7 +28,9 @@ apply from: 'gradle/groovy.gradle'
 apply from: 'gradle/checkstyle.gradle'
 apply from: 'gradle/gradle-plugin.gradle'
 apply from: 'gradle/base-package.gradle'
+apply from: 'gradle/publish-java.gradle'
 apply from: 'gradle/publish-gradle-plugin.gradle'
+apply from: 'gradle/signing.gradle'
 apply from: 'gradle/ide.gradle'
 apply from: 'gradle/renovate.gradle'
 
@@ -40,11 +43,31 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        'name.remal.template-plugin.v2' {
+        'name.remal.template-plugin' {
             id = 'name.remal.template-plugin'
             implementationClass = 'name.remal.gradleplugins.template.TemplatePlugin'
             displayName = 'Template plugin'
             description = property('repository-description')
+        }
+    }
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+apply plugin: 'maven-publish'
+
+allprojects {
+    pluginManager.withPlugin('maven-publish') {
+        publishing.publications.withType(MavenPublication) {
+            pom {
+                developers {
+                    developer {
+                        name = 'Semyon Levin'
+                        email = 'levin.semen@gmail.com'
+                        id = email
+                    }
+                }
+            }
         }
     }
 }
