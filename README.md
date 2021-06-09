@@ -1,3 +1,3 @@
-# name.remal.template.v2
+# name.remal.template
 
 Gradle plugin template
