@@ -49,7 +49,7 @@ jobs:
       id: gradle-caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
@@ -98,7 +98,7 @@ jobs:
     - name: Cache Gradle caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
@@ -213,7 +213,7 @@ jobs:
     - name: Cache Gradle caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
@@ -275,7 +275,7 @@ jobs:
     - name: Cache Gradle caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
@@ -375,7 +375,7 @@ jobs:
     - name: Cache Gradle caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
@@ -441,7 +441,7 @@ jobs:
     - name: Cache Gradle caches
       uses: actions/cache@v3
       with:
-        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/gradle.properties')}}
+        key: ${{runner.os}}-gradle-caches-${{hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle', '**/*.gradle.kts', '**/gradle.properties')}}
         path: |
           ~/.gradle/caches
           ~/.gradle/notifications
