@@ -63,9 +63,6 @@ jobs:
     - populate-cache
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    concurrency:
-      group: build-${{github.ref}}
-      cancel-in-progress: true
     outputs:
       repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
       publish-isGradlePlugin: ${{steps.publish-flags.outputs.isGradlePlugin}}
@@ -169,9 +166,6 @@ jobs:
       fail-fast: false
       matrix:
         gradle-version: ${{fromJSON(needs.build.outputs.gradle-versions)}}
-    concurrency:
-      group: cross-versions-tests-${{github.ref}}-${{toJSON(matrix)}}
-      cancel-in-progress: true
     env:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION_EXCEPT_TESTS: 'true'
