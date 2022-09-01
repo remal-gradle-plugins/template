@@ -51,11 +51,14 @@ jobs:
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true'}}
       run: |
         ./gradlew help
-        rm -f ~/.gradle/wrapper/dists/*/*/*.zip
     - name: Create Gradle caches cache content
       if: ${{steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       run: |
         ./gradlew downloadDependencies
+    - name: Cleanup Gradle wrapper cache
+      if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
+      run: |
+        rm -f ${{env.GRADLE_USER_HOME || '~/.gradle'}}/wrapper/dists/*/*/*.zip
 
 
   build:
