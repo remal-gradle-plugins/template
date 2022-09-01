@@ -245,6 +245,9 @@ jobs:
     - name: Update README
       run: |
         ./gradlew processReadme
+    - name: Collect all Gradle plugin API dependencies
+      run: |
+        ./gradlew collectAllGradlePluginApiDependencies
     - name: Update IDEA settings
       run: |
         ./gradlew processIdeaSettings
