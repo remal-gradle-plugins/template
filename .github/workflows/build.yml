@@ -8,7 +8,7 @@ on:
     - '*'
   pull_request: { }
   schedule:
-  - cron: '43 6 * * *'
+  - cron: '37 6 * * *'
   workflow_dispatch: { }
 
 defaults:
