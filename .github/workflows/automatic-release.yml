@@ -26,6 +26,7 @@ jobs:
           gradle-plugin-api-dependencies.txt
         allowedCommitPrefixes: |
           [push-back]
+          [ci]
         allowedPullRequestLabels: |
           dependencies
           sync-with-template
