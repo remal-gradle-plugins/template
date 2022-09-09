@@ -19,7 +19,6 @@ jobs:
     - name: Automatic release
       uses: remal-github-actions/automatic-release@v1
       with:
-        dryRun: 'true'
         versionIncrementMode: 'patch'
         versionTagPrefix: 'v'
         expectedFilesToChange: |
