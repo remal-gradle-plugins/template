@@ -24,7 +24,7 @@ jobs:
       with:
         github-token: ${{secrets.PUSH_BACK_TOKEN}}
         script: |
-          const commits = await octokit.rest.repos.listCommits({
+          const commits = await github.rest.repos.listCommits({
             owner: context.repo.owner,
             repo: context.repo.repo,
           })
