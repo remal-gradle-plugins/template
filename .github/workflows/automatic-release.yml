@@ -19,6 +19,7 @@ jobs:
     - name: Automatic release
       uses: remal-github-actions/automatic-release@v1
       with:
+        githubToken: ${{secrets.PUSH_BACK_TOKEN}}
         versionIncrementMode: 'patch'
         versionTagPrefix: 'v'
         expectedFilesToChange: |
