@@ -11,14 +11,15 @@ on:
   workflow_dispatch: { }
 
 jobs:
-  check-if-bump-needed:
+  check-if-bump-is-needed:
     outputs:
       result: ${{steps.check.outputs.result}}
+    name: Check if bump is needed
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency: bump-repository-activity
     steps:
-    - name: Check if bump needed
+    - name: Check if bump is needed
       id: check
       uses: actions/github-script@v5
       with:
@@ -27,6 +28,7 @@ jobs:
           const commits = await github.rest.repos.listCommits({
             owner: context.repo.owner,
             repo: context.repo.repo,
+            per_page: 1,
           })
           if (!commits.length) throw new Error('No commits retieved')
           const commit = commits[0]
@@ -59,8 +61,9 @@ jobs:
 
   bump-repository-activity:
     needs:
-    - check-if-bump-needed
+    - check-if-bump-is-needed
     if: ${{needs.check-if-bump-needed.outputs.result == 't123rue'}}
+    name: Bump repository activity
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency: bump-repository-activity
