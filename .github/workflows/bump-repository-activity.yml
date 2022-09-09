@@ -11,58 +11,7 @@ on:
   workflow_dispatch: { }
 
 jobs:
-  check-if-bump-is-needed:
-    outputs:
-      result: ${{steps.check.outputs.result}}
-    name: Check if bump is needed
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    concurrency: bump-repository-activity
-    steps:
-    - name: Check if bump is needed
-      id: check
-      uses: actions/github-script@v5
-      with:
-        github-token: ${{secrets.PUSH_BACK_TOKEN}}
-        script: |
-          const commits = await github.rest.repos.listCommits({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            per_page: 1,
-          })
-          if (!commits.length) throw new Error('No commits retieved')
-          const commit = commits[0]
-          const authorDate = commit.author != null ? commit.author.date : null
-          core.info(`authorDate = ${authorDate}`)
-          const committerDate = commit.committer != null ? commit.committer.date : null
-          core.info(`committerDate = ${committerDate}`)
-          let date = null
-          if (authorDate != null && committerDate != null) {
-            date = authorDate.getTime() > committerDate.getTime() ? authorDate : committerDate
-          } else if (authorDate != null) {
-            date = authorDate
-          } else if (committerDate != null) {
-            date = committerDate
-          } else {
-            throw new Error('Both author and commiter dates are null')
-          }
-          core.info(`date = ${date}`)
-          const timestamp = date.getTime()
-          core.info(`timestamp = ${timestamp}`)
-          const minTimestamp = new Date().getTime() - (2 * 7 * 24 * 60 * 60 * 1000)
-          core.info(`minTimestamp = ${minTimestamp}`)
-          if (timestamp < minTimestamp) {
-            core.info('true')
-            core.setOutput('result', true)
-          } else {
-            core.info('false')
-            core.setOutput('result', false)
-          }
-
   bump-repository-activity:
-    needs:
-    - check-if-bump-is-needed
-    if: ${{needs.check-if-bump-needed.outputs.result == 't123rue'}}
     name: Bump repository activity
     runs-on: ubuntu-latest
     timeout-minutes: 15
