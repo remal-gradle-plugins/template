@@ -21,5 +21,5 @@ jobs:
       uses: remal-github-actions/bump-repository-activity@v1
       with:
         githubToken: ${{secrets.PUSH_BACK_TOKEN}}
-        bumperFile: 'repository-activity-test.bumper'
+        bumperFile: 'repository-activity.bumper'
         commitMessage: '[push-back] Bump repository activity'
