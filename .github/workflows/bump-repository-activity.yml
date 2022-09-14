@@ -22,4 +22,4 @@ jobs:
       with:
         githubToken: ${{secrets.PUSH_BACK_TOKEN}}
         bumperFile: 'repository-activity.bumper'
-        message: '[push-back] Bump repository activity'
+        commitMessage: '[push-back] Bump repository activity'
