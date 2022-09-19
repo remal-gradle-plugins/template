@@ -5,8 +5,8 @@ buildscript {
         classpath 'name.remal.gradle-plugins.toolkit:build-logic:0.27.4'
     }
     repositories {
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
