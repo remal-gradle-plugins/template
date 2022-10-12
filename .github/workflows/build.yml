@@ -41,6 +41,8 @@ jobs:
     - name: Cache Gradle
       id: cache-gradle
       uses: remal-github-actions/cache-gradle@main
+      with:
+        build-cache-enabled: 'false'
     - name: Setup Java 11
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       uses: actions/setup-java@v3
