@@ -37,4 +37,4 @@ gradlePlugin {
     }
 }
 
-println gradle.gradleHomeDir
+println gradle.gradleUserHomeDir
