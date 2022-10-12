@@ -122,7 +122,6 @@ jobs:
         else
           echo "isGradlePlugin = false"
           echo 'isGradlePlugin=false' >> $GITHUB_OUTPUT
-          echo '::set-output name=isGradlePlugin::false'
         fi
         if [ -f "build/publish-maven-central.flag" ]; then
           echo "isMavenCentral = true"
