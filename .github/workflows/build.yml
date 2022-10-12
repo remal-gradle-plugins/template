@@ -118,17 +118,18 @@ jobs:
       run: |
         if [ -f "build/publish-gradle-plugin.flag" ]; then
           echo "isGradlePlugin = true"
-          echo '::set-output name=isGradlePlugin::true'
+          echo 'isGradlePlugin=true' >> $GITHUB_OUTPUT
         else
           echo "isGradlePlugin = false"
+          echo 'isGradlePlugin=false' >> $GITHUB_OUTPUT
           echo '::set-output name=isGradlePlugin::false'
         fi
         if [ -f "build/publish-maven-central.flag" ]; then
           echo "isMavenCentral = true"
-          echo '::set-output name=isMavenCentral::true'
+          echo 'isMavenCentral=true' >> $GITHUB_OUTPUT
         else
           echo "isMavenCentral = false"
-          echo '::set-output name=isMavenCentral::false'
+          echo 'isMavenCentral=false' >> $GITHUB_OUTPUT
         fi
     - name: Archive workspace
       run: |
