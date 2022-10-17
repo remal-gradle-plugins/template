@@ -11,7 +11,9 @@ for ATTEMPT in $(seq 1 5); do
 
     LOGFILE=$(mktemp)
 
-    ("$@" |& tee "$LOGFILE") || RESULT=$?
+    "$@" |& tee "$LOGFILE"
+    RESULT="${PIPESTATUS[0]}"
+    echo "RESULT=$RESULT"
 
     if [ "$RESULT" -eq 0 ]; then
         exit 0

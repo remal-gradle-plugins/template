@@ -12,7 +12,7 @@ buildscript {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-throw new GradleException()
+throw new GradleException(1.toString())
 
 allprojects {
     group = "name.remal.gradle-plugins.${rootProject.name}"
