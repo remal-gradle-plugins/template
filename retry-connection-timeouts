@@ -5,18 +5,28 @@ DELAY_INTERVAL=1
 
 for ATTEMPT in $(seq 1 5); do
     if [ "$ATTEMPT" -gt 1 ]; then
-        echo -e "\n\nWaiting $DELAY_INTERVAL before attempt $ATTEMPT...\n\n"
+        echo -e "\n\nWaiting $DELAY_INTERVAL seconds before attempt $ATTEMPT...\n\n"
         sleep "$DELAY_INTERVAL"
     fi
 
     LOGFILE=$(mktemp)
+    echo "::debug::Storing console output of $* in $LOGFILE"
+    echo "::warning::Storing console output of $* in $LOGFILE"
 
     "$@" |& tee "$LOGFILE"
     RESULT="${PIPESTATUS[0]}"
-    echo "RESULT=$RESULT"
 
     if [ "$RESULT" -eq 0 ]; then
         exit 0
+
+    elif STR="connect timed out" && grep -q "\b$STR\b" "$LOGFILE"; then
+        echo "::warning::'$STR' found in in $LOGFILE"
+
+    elif STR="problem occurred evaluating root project" && grep -q "\b$STR\b" "$LOGFILE"; then
+        echo "::warning::'$STR' found in in $LOGFILE"
+
+    else
+        break
     fi
 done
 
