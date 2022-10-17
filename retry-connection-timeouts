@@ -14,7 +14,7 @@ for ATTEMPT in $(seq 1 5); do
     fi
 
     LOGFILE=$(mktemp)
-    echo "${TRACE_COLOR}Storing console output of $* in $LOGFILE${NO_COLOR}"
+    echo -e "${TRACE_COLOR}Storing console output of $* in $LOGFILE${NO_COLOR}"
 
     "$@" |& tee "$LOGFILE"
     RESULT="${PIPESTATUS[0]}"
@@ -23,10 +23,10 @@ for ATTEMPT in $(seq 1 5); do
         exit 0
 
     elif STR="connect timed out" && grep -q "\b$STR\b" "$LOGFILE"; then
-        echo "::warning::'$STR' found in $LOGFILE, retrying"
+        echo "::warning::'$STR' found in log file $LOGFILE, retrying"
 
     elif STR="oblem occurred evaluating root project" && grep -q "\b$STR\b" "$LOGFILE"; then
-        echo "::warning::'$STR' found in $LOGFILE, retrying"
+        echo "::warning::'$STR' found in log file $LOGFILE, retrying"
 
     else
         break
