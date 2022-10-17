@@ -12,6 +12,8 @@ buildscript {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+throw new GradleException()
+
 allprojects {
     group = "name.remal.gradle-plugins.${rootProject.name}"
     version = '2-SNAPSHOT'

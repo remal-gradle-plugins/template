@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+RESULT=0
+DELAY_INTERVAL=1
+
+for ATTEMPT in $(seq 1 5); do
+    if [ "$ATTEMPT" -gt 1 ]; then
+        echo -e "\n\nWaiting $DELAY_INTERVAL before attempt $ATTEMPT...\n\n"
+        sleep "$DELAY_INTERVAL"
+    fi
+
+    LOGFILE=$(mktemp)
+
+    ("$@" |& tee "$LOGFILE") || RESULT=$?
+
+    if [ "$RESULT" -eq 0 ]; then
+        exit 0
+    fi
+done
+
+exit "$RESULT"

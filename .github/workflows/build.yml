@@ -56,7 +56,7 @@ jobs:
     - name: Create Gradle caches cache content
       if: ${{steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       run: |
-        ./gradlew downloadDependencies
+        ./retry-connection-timeouts ./gradlew downloadDependencies
 
 
   build:
