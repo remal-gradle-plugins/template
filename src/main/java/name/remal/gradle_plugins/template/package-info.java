@@ -1,4 +1,4 @@
 @NonNullApi
-package name.remal.gradleplugins.template;
+package name.remal.gradle_plugins.template;
 
 import org.gradle.api.NonNullApi;

@@ -1,4 +1,4 @@
-package name.remal.gradleplugins.template;
+package name.remal.gradle_plugins.template;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
