@@ -20,3 +20,15 @@
     return content
         .replaceAll(/(`)build\1/g, '$1cross-versions-tests-success$1')
         .replaceAll(/(=\s*)build(\n|$)/g, '$1cross-versions-tests-success$2')
+- name: renovate
+  format: text
+  includes:
+  - .github/renovate.json5
+  replaceWithText: |
+    {
+      $schema: "https://docs.renovatebot.com/renovate-schema.json",
+      extends: ["github>remal-gradle-plugins/plugins-renovate-config:base"],
+
+      // $$$sync-with-template-modifiable: local
+      // $$$sync-with-template-modifiable-end$$$
+    }
