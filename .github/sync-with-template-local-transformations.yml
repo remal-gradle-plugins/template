@@ -6,3 +6,17 @@
     return content
         .replace(/(^|\n)!\/\.idea\/externalDependencies\.xml(\n|$)/, '$1')
         .replace(/(^|\n)!\/\.idea\/saveactions_settings\.xml(\n|$)/, '$1')
+        + [
+            '',
+            '# Remal Gradle plugins:',
+            '/gradle-ci.properties',
+            '',
+        ].join('\n')
+- name: mergify
+  format: text
+  includes:
+  - .mergify/config.yml
+  script: |
+    return content
+        .replaceAll(/(`)build\1/, '$1cross-versions-tests-success$1')
+        .replaceAll(/(=\s*)build(\n|$)/, '$1cross-versions-tests-success$2')
