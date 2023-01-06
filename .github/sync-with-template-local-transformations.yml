@@ -1,3 +1,7 @@
+repositories:
+- remal-gradle-plugins/template
+
+transformations:
 - name: .gitignore
   format: text
   includes:
