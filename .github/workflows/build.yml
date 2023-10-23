@@ -53,6 +53,7 @@ jobs:
       id: cache-gradle
       uses: remal-github-actions/cache-gradle@main
       with:
+        lookup-only: 'true'
         build-cache-enabled: 'false'
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
