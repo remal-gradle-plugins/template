@@ -235,6 +235,10 @@ jobs:
         with: |
           name: workspace
           path: /tmp
+    - name: Test
+      env:
+        TEST: ${{fromJSON(steps.download-workspace.outputs.out)}}
+      run: echo "$TEST"
     - name: Unarchive workspace
       run: |
         tar -xz -f "${{fromJSON(steps.download-workspace.outputs.out).download-path}}/workspace-${{github.run_id}}.tar.gz"
