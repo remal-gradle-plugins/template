@@ -235,13 +235,10 @@ jobs:
         with: |
           name: workspace
           path: /tmp
-    - name: Test
-      env:
-        TEST: '${{steps.download-workspace.outputs.outputs}}'
       run: echo "$TEST"
     - name: Unarchive workspace
       run: |
-        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.out).download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Execute tests
       run: |
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage "-Pjava-runtime.version=${{matrix.java}}" "-Pgradle-api.version=${{matrix.gradle}}"
@@ -308,7 +305,7 @@ jobs:
           path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.out).download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Update README
       run: |
         ./gradlew-retry-connection-timeouts processReadme "-Pjava-runtime.max-version=${{fromJSON(needs.build.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(needs.build.outputs.allMatrixIncludes)[0].gradle}}"
@@ -397,7 +394,7 @@ jobs:
           path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.out).download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Publish to Gradle Plugin Portal
       run: |
         ./gradlew-retry-connection-timeouts publishPlugins "-Pgradle.publish.key=${{secrets.GRADLE_PLUGINS_PORTAL_KEY}}" "-Pgradle.publish.secret=${{secrets.GRADLE_PLUGINS_PORTAL_SECRET}}"
@@ -448,7 +445,7 @@ jobs:
           path: /tmp
     - name: Unarchive workspace
       run: |
-        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.out).download-path}}/workspace-${{github.run_id}}.tar.gz"
+        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
     - name: Publish to Maven Central
       run: |
         ./gradlew-retry-connection-timeouts publishToSonatype closeAndReleaseSonatypeStagingRepository "-PsonatypeUsername=${{secrets.OSS_USER}}" "-PsonatypePassword=${{secrets.OSS_PASSWORD}}" "-Psigning.key=${{secrets.SIGNING_SECRET_KEY_RING}}" "-Psigning.keyId=${{secrets.SIGNING_KEY_ID}}" "-Psigning.password=${{secrets.SIGNING_PASSWORD}}"
