@@ -237,7 +237,7 @@ jobs:
           path: /tmp
     - name: Test
       env:
-        TEST: ${{steps.download-workspace.outputs.out}}
+        TEST: ${{steps.download-workspace.outputs}}
       run: echo "$TEST"
     - name: Unarchive workspace
       run: |
