@@ -13,4 +13,5 @@
       datasourceTemplate: "gradle-version",
       versioningTemplate: "gradle",
     },
+  ],
 }
