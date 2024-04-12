@@ -37,10 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      group: ${{github.workflow}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}-${{strategy.job-index||'0'}}
+      group: ${{github.workflow}}-${{github.job}}-${{strategy.job-index||'0'}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}
       cancel-in-progress: true
-    env:
-      TEST: ${{github.job}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -81,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      group: ${{github.workflow}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}-${{strategy.job-index||'0'}}
+      group: ${{github.workflow}}-${{github.job}}-${{strategy.job-index||'0'}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}
       cancel-in-progress: true
     outputs:
       repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
@@ -213,7 +211,7 @@ jobs:
       matrix:
         include: ${{fromJSON(needs.build.outputs.allMatrixIncludes)}}
     concurrency:
-      group: ${{github.workflow}}-cross-versions-tests-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}-${{strategy.job-index||'0'}}
+      group: ${{github.workflow}}-${{github.job}}-${{strategy.job-index||'0'}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}
       cancel-in-progress: true
     env:
       DISABLE_COMPILATION: 'true'
@@ -284,7 +282,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
-      group: ${{github.workflow}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}-${{strategy.job-index||'0'}}
+      group: ${{github.workflow}}-${{github.job}}-${{strategy.job-index||'0'}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}
       cancel-in-progress: true
     env:
       DISABLE_COMPILATION: 'true'
@@ -344,7 +342,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
-      group: ${{github.workflow}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}-${{strategy.job-index||'0'}}
+      group: ${{github.workflow}}-${{github.job}}-${{strategy.job-index||'0'}}-${{github.event.pull_request.number && format('pr:{0}', github.event.pull_request.number) || github.ref}}
       cancel-in-progress: true
     outputs:
       isVersion: ${{fromJSON(steps.parse-git-tag.outputs.result).isVersion}}
