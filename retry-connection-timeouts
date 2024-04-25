@@ -8,7 +8,7 @@ NO_COLOR='\033[0m'
 
 RESULT=0
 
-for ATTEMPT in $(seq 1 3); do
+for ATTEMPT in $(seq 1 2); do
     if [ "$ATTEMPT" -gt 1 ]; then
         echo -e "\n${HIGHLIGHT_COLOR}Waiting $DELAY_INTERVAL seconds before attempt #$ATTEMPT...${NO_COLOR}\n"
         sleep "$DELAY_INTERVAL"
