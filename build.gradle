@@ -29,18 +29,18 @@ apply plugin: 'name.remal.toolkit.build-logic'
 
 // TODO: REMOVE THIS SECTION FOR REAL PLUGIN
 if (project.isRunningOnCi) {
-    String repositoryName = project.ext['repository-name'] ?: ''
-    if (repositoryName.isEmpty()) {
-        throw new GradleException('`repository-name` property is empty')
-    }
-    if (repositoryName != 'template') {
-        throw new GradleException('This code should be executed for template repository only')
-    }
-
     TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
         outputs.upToDateWhen { false }
 
         doLast {
+            String repositoryName = project.ext['repository-name'] ?: ''
+            if (repositoryName.isEmpty()) {
+                throw new GradleException('`repository-name` property is empty')
+            }
+            if (repositoryName != 'template') {
+                throw new GradleException('This code should be executed for template repository only')
+            }
+
             File file = project.file('gradle.properties')
             String content = file.getText('UTF-8')
             boolean replaced = false
