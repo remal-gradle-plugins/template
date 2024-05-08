@@ -1,3 +1,5 @@
+import org.gradle.util.GradleVersion
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 buildscript {
@@ -22,6 +24,43 @@ allprojects {
 }
 
 apply plugin: 'name.remal.toolkit.build-logic'
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// TODO: REMOVE THIS SECTION FOR REAL PLUGIN
+if (project.isRunningOnCi) {
+    String repositoryName = project.ext['repository-name'] ?: ''
+    if (repositoryName.isEmpty()) {
+        throw new GradleException('`repository-name` property is empty')
+    }
+    if (repositoryName != 'template') {
+        throw new GradleException('This code should be executed for template repository only')
+    }
+
+    TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
+        outputs.upToDateWhen { false }
+
+        doLast {
+            File file = project.file('gradle.properties')
+            String content = file.getText('UTF-8')
+            boolean replaced = false
+            content = content.replaceFirst(/((?:^|[\r\n]\s*)gradle-api.min-version)\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+                GradleVersion lastMinorVersion = project.getAllGradleVersions().findAll { GradleVersion ver ->
+                    ver == ver.baseVersion && ver.version.count('.') == 1
+                }[1]
+                replaced = true
+                return "${groups[1]} = ${lastMinorVersion.version}${groups[2]}"
+            }
+            if (replaced) {
+                file.setText(content, 'UTF-8')
+            }
+        }
+    }
+
+    tasks.named('processReadme').configure {
+        dependsOn(processGradleProperties)
+    }
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
