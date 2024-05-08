@@ -42,16 +42,30 @@ if (project.isRunningOnCi) {
             }
 
             File file = project.file('gradle.properties')
+            Properties currentProperties = new Properties()
+            file.withReader('UTF-8') { currentProperties.load(it) }
+
             String content = file.getText('UTF-8')
-            boolean replaced = false
-            content = content.replaceFirst(/((?:^|[\r\n]\s*)gradle-api.min-version)\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+            Map<String, String> handledProperties = [:]
+            content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
                 GradleVersion lastMinorVersion = project.getAllGradleVersions().findAll { GradleVersion ver ->
                     ver == ver.baseVersion && ver.version.count('.') == 1
                 }[1]
-                replaced = true
-                return "${groups[1]} = ${lastMinorVersion.version}${groups[2]}"
+                String value = lastMinorVersion.version
+                handledProperties[groups[2]] = value
+                return "${groups[1]} = ${value}${groups[3]}"
             }
-            if (replaced) {
+
+            handledProperties.entrySet().removeIf { entry ->
+                String currentValue = currentProperties.getProperty(entry.key)
+                return currentValue == entry.value
+            }
+
+            handledProperties.keySet().forEach { key ->
+                println "  Changing property: $key"
+            }
+
+            if (!handledProperties.isEmpty()) {
                 file.setText(content, 'UTF-8')
             }
         }
