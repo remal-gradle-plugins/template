@@ -27,18 +27,54 @@ apply plugin: 'name.remal.toolkit.build-logic'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: REMOVE THIS SECTION FOR REAL PLUGIN
+apply plugin: 'java-gradle-plugin'
+
+dependencies {
+}
+
+gradlePlugin {
+    plugins {
+        'name.remal.template-plugin' {
+            id = 'name.remal.template-plugin'
+            implementationClass = 'name.remal.gradle_plugins.template.TemplatePlugin'
+            displayName = 'Template plugin'
+            description = property('repository-description')
+        }
+    }
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* TODO: REMOVE THIS SECTION FOR REAL PLUGIN                                 */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 if (project.isRunningOnCi) {
+    TaskProvider validateRepositoryProperties = tasks.register('validateRepositoryProperties') {
+        outputs.upToDateWhen { false }
+
+        doLast {
+            String rootProjectName = project.rootProject.name
+            String repositoryName = project.ext['repository-name']
+            if (rootProjectName != repositoryName) {
+                throw new GradleException("Root project name ('$rootProjectName') does NOT equal to the repository name: '$repositoryName'")
+            }
+        }
+    }
+
+    tasks.named('check').configure {
+        dependsOn(validateRepositoryProperties)
+    }
+
+
     TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
         outputs.upToDateWhen { false }
 
         doLast {
             String repositoryName = project.ext['repository-name'] ?: ''
             if (repositoryName.isEmpty()) {
-                throw new GradleException('`repository-name` property is empty')
+                throw new GradleException("`repository-name` property is empty")
             }
             if (repositoryName != 'template') {
-                throw new GradleException('This code should be executed for template repository only')
+                throw new GradleException("This code should be executed for template repository only")
             }
 
             File file = project.file('gradle.properties')
@@ -73,23 +109,5 @@ if (project.isRunningOnCi) {
 
     tasks.named('processReadme').configure {
         dependsOn(processGradleProperties)
-    }
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-apply plugin: 'java-gradle-plugin'
-
-dependencies {
-}
-
-gradlePlugin {
-    plugins {
-        'name.remal.template-plugin' {
-            id = 'name.remal.template-plugin'
-            implementationClass = 'name.remal.gradle_plugins.template.TemplatePlugin'
-            displayName = 'Template plugin'
-            description = property('repository-description')
-        }
     }
 }
