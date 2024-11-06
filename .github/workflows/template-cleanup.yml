@@ -52,7 +52,7 @@ jobs:
           PACKAGE_ACTOR=$(echo $ACTOR | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
           PACKAGE="com.github.$PACKAGE_ACTOR.$PACKAGE_NAME"
         fi
-        find src -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
+        find . -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
         mkdir -p src/main/java/${PACKAGE//.//}
         cp -R src/main/java/name/remal/gradle_plugins/template/* src/main/java/${PACKAGE//.//}/
         rm -rf src/main/java/name/remal/gradle_plugins/template
