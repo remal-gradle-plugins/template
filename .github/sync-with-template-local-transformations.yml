@@ -1,3 +1,5 @@
+$schema: https://raw.githubusercontent.com/remal-github-actions/sync-with-template/main/local-transformations.schema.json
+
 repositories:
 - remal-gradle-plugins/template
 
