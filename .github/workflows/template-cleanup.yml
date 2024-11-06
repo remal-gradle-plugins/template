@@ -52,13 +52,6 @@ jobs:
           PACKAGE_ACTOR=$(echo $ACTOR | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
           PACKAGE="com.github.$PACKAGE_ACTOR.$PACKAGE_NAME"
         fi
-        find . -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
-        mkdir -p src/main/java/${PACKAGE//.//}
-        cp -R src/main/java/name/remal/gradle_plugins/template/* src/main/java/${PACKAGE//.//}/
-        rm -rf src/main/java/name/remal/gradle_plugins/template
-        mkdir -p src/test/java/${PACKAGE//.//}
-        cp -R src/test/java/name/remal/gradle_plugins/template/* src/test/java/${PACKAGE//.//}/
-        rm -rf src/test/java/name/remal/gradle_plugins/template
 
         sed -i "s/%NAME%/$NAME/g" .github/template-cleanup/*
         sed -i "s/%REPOSITORY%/${GITHUB_REPOSITORY/\//\\/}/g" .github/template-cleanup/*
@@ -66,6 +59,14 @@ jobs:
         sed -i "s/%ID_NAME%/$ID_NAME/g" .github/template-cleanup/*
         sed -i "s/%ID%/$ID/g" .github/template-cleanup/*
         cp -R .github/template-cleanup/. .
+
+        find . -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
+        mkdir -p src/main/java/${PACKAGE//.//}
+        cp -R src/main/java/name/remal/gradle_plugins/template/* src/main/java/${PACKAGE//.//}/
+        rm -rf src/main/java/name/remal/gradle_plugins/template
+        mkdir -p src/test/java/${PACKAGE//.//}
+        cp -R src/test/java/name/remal/gradle_plugins/template/* src/test/java/${PACKAGE//.//}/
+        rm -rf src/test/java/name/remal/gradle_plugins/template
 
         rm -rf \
           .github/sync-with-template-local-transformations.yml \
