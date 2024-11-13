@@ -60,7 +60,7 @@ jobs:
         sed -i "s/%ID%/$ID/g" .github/template-cleanup/*
         cp -R .github/template-cleanup/. .
 
-        find . -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
+        find . -not \( -path "./.git/*" \) -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
         mkdir -p src/main/java/${PACKAGE//.//}
         cp -R src/main/java/name/remal/gradle_plugins/template/* src/main/java/${PACKAGE//.//}/
         rm -rf src/main/java/name/remal/gradle_plugins/template
