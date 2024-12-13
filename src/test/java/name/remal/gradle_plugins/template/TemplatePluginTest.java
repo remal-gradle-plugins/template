@@ -1,8 +1,12 @@
 package name.remal.gradle_plugins.template;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static name.remal.gradle_plugins.toolkit.reflection.ReflectionUtils.packageNameOf;
+import static name.remal.gradle_plugins.toolkit.reflection.ReflectionUtils.unwrapGeneratedSubclass;
+import static name.remal.gradle_plugins.toolkit.testkit.ProjectValidations.executeAfterEvaluateActions;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import name.remal.gradle_plugins.toolkit.testkit.TaskValidations;
 import org.gradle.api.Project;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +22,16 @@ class TemplatePluginTest {
     }
 
     @Test
-    void test() {
-        assertTrue(project.getPlugins().hasPlugin(TemplatePlugin.class));
+    void pluginTasksDoNotHavePropertyProblems() {
+        executeAfterEvaluateActions(project);
+
+        val taskClassNamePrefix = packageNameOf(TemplatePlugin.class) + '.';
+        project.getTasks().stream()
+            .filter(task -> {
+                val taskClass = unwrapGeneratedSubclass(task.getClass());
+                return taskClass.getName().startsWith(taskClassNamePrefix);
+            })
+            .forEach(TaskValidations::assertNoTaskPropertiesProblems);
     }
 
 }
