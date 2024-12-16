@@ -6,4 +6,10 @@
 
 [![configuration cache: not supported](https://img.shields.io/static/v1?label=configuration%20cache&message=not%20supported&color=inactive)](https://docs.gradle.org/current/userguide/configuration_cache.html)
 
+Usage:
+
+<!--plugin-usage:name.remal.template--><!--/plugin-usage-->
+
+&nbsp;
+
 Gradle plugin template
