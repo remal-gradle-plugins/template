@@ -8,7 +8,7 @@
 
 Usage:
 
-<!--plugin-usage:name.remal.template--><!--/plugin-usage-->
+<!--plugin-usage:name.remal.template-plugin--><!--/plugin-usage-->
 
 &nbsp;
 
