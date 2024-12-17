@@ -8,7 +8,13 @@
 
 Usage:
 
-<!--plugin-usage:name.remal.template-plugin--><!--/plugin-usage-->
+<!--plugin-usage:name.remal.template-plugin-->
+```groovy
+plugins {
+    id 'name.remal.template-plugin' version '1-SNAPSHOT'
+}
+```
+<!--/plugin-usage-->
 
 &nbsp;
 
