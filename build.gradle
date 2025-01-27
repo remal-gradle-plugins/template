@@ -47,67 +47,70 @@ gradlePlugin {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* TODO: REMOVE THIS SECTION FOR REAL PLUGIN                                 */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-if (project.isRunningOnCi) {
-    TaskProvider validateRepositoryProperties = tasks.register('validateRepositoryProperties') {
-        outputs.upToDateWhen { false }
 
-        doLast {
-            String rootProjectName = project.rootProject.name
-            String repositoryName = project.ext['repository-name']
-            if (rootProjectName != repositoryName) {
-                throw new GradleException("Root project name ('$rootProjectName') does NOT equal to the repository name: '$repositoryName'")
-            }
+TaskProvider validateRepositoryProperties = tasks.register('validateRepositoryProperties') {
+    outputs.upToDateWhen { false }
+    group = 'verification'
+
+    Property<String> rootProjectNameProperty = objects.property(String).value(provider { project.rootProject.name }).with { it.finalizeValueOnRead(); it }
+    Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
+
+    doLast {
+        String rootProjectName = rootProjectNameProperty.get()
+        String repositoryName = repositoryNameProperty.getOrNull()
+        if (rootProjectName != repositoryName) {
+            throw new GradleException("Root project name ('$rootProjectName') does NOT equal to the repository name: '$repositoryName'")
         }
-    }
-
-    tasks.named('check').configure {
-        dependsOn(validateRepositoryProperties)
-    }
-
-
-    TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
-        outputs.upToDateWhen { false }
-
-        doLast {
-            String repositoryName = project.ext['repository-name'] ?: ''
-            if (repositoryName.isEmpty()) {
-                throw new GradleException("`repository-name` property is empty")
-            }
-            if (repositoryName != 'template') {
-                throw new GradleException("This code should be executed for template repository only")
-            }
-
-            File file = project.file('gradle.properties')
-            Properties currentProperties = new Properties()
-            file.withReader('UTF-8') { currentProperties.load(it) }
-
-            String content = file.getText('UTF-8')
-            Map<String, String> handledProperties = [:]
-            content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
-                GradleVersion lastMinorVersion = project.getAllGradleVersions().findAll { GradleVersion ver ->
-                    ver == ver.baseVersion && ver.version.count('.') == 1
-                }[1]
-                String value = lastMinorVersion.version
-                handledProperties[groups[2]] = value
-                return "${groups[1]} = ${value}${groups[3]}"
-            }
-
-            handledProperties.entrySet().removeIf { entry ->
-                String currentValue = currentProperties.getProperty(entry.key)
-                return currentValue == entry.value
-            }
-
-            handledProperties.keySet().forEach { key ->
-                println "  Changing property: $key"
-            }
-
-            if (!handledProperties.isEmpty()) {
-                file.setText(content, 'UTF-8')
-            }
-        }
-    }
-
-    tasks.named('processReadme').configure {
-        dependsOn(processGradleProperties)
     }
 }
+
+tasks.named('check').configure { dependsOn(validateRepositoryProperties) }
+
+
+TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
+    outputs.upToDateWhen { false }
+
+    Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
+    RegularFileProperty gradlePropertiesFileProperty = objects.fileProperty().value(layout.projectDirectory.file('gradle.properties'))
+    ListProperty<GradleVersion> allGradleVersions = objects.listProperty(GradleVersion).value(provider { project.getAllGradleVersions() }).with { it.finalizeValueOnRead(); it }
+
+    doLast {
+        String repositoryName = repositoryNameProperty.getOrNull() ?: ''
+        if (repositoryName.isEmpty()) {
+            throw new GradleException("`repository-name` property is empty")
+        }
+        if (repositoryName != 'template') {
+            throw new GradleException("This code should be executed for template repository only")
+        }
+
+        File file = gradlePropertiesFileProperty.get().asFile
+        Properties currentProperties = new Properties()
+        file.withReader('UTF-8') { currentProperties.load(it) }
+
+        String content = file.getText('UTF-8')
+        Map<String, String> handledProperties = [:]
+        content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+            GradleVersion lastMinorVersion = allGradleVersions.get().findAll { GradleVersion ver ->
+                ver == ver.baseVersion && ver.version.count('.') == 1
+            }[1]
+            String value = lastMinorVersion.version
+            handledProperties[groups[2]] = value
+            return "${groups[1]} = ${value}${groups[3]}"
+        }
+
+        handledProperties.entrySet().removeIf { entry ->
+            String currentValue = currentProperties.getProperty(entry.key)
+            return currentValue == entry.value
+        }
+
+        handledProperties.keySet().forEach { key ->
+            println "  Changing property: $key"
+        }
+
+        if (!handledProperties.isEmpty()) {
+            file.setText(content, 'UTF-8')
+        }
+    }
+}
+
+tasks.named('pushBackTasks').configure { dependsOn(processGradleProperties) }
