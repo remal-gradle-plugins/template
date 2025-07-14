@@ -189,7 +189,7 @@ jobs:
           java:
             dependency: java
             only:
-            - lts
+            - lts + stable
             include:
             - '[${{steps.min-java-version.outputs.value}},)'
           gradle:
