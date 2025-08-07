@@ -73,6 +73,8 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
     Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
     RegularFileProperty gradlePropertiesFileProperty = objects.fileProperty().value(layout.projectDirectory.file('gradle.properties'))
 
+    ListProperty<Integer> javaLtsVersions = objects.listProperty(Integer).value(provider { project.getLtsJavaRuntimeVersions() }).with { it.finalizeValueOnRead(); it }
+
     ListProperty<GradleVersion> allGradleVersions = objects.listProperty(GradleVersion).value(provider { project.getAllGradleVersions() }).with { it.finalizeValueOnRead(); it }
     ListProperty<GradleVersion> lastMinorVersions = objects.listProperty(GradleVersion).value(provider {
         Map<String, GradleVersion> result = [:]
@@ -102,9 +104,15 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
 
         String content = file.getText('UTF-8')
         Map<String, String> handledProperties = [:]
+
+        content = content.replaceFirst(/((?:^|[\r\n]\s*)(java-runtime.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+            String value = javaLtsVersions.get()[1]
+            handledProperties[groups[2]] = value
+            return "${groups[1]} = ${value}${groups[3]}"
+        }
+
         content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
-            GradleVersion minorVersion = lastMinorVersions.get().findAll { it == it.baseVersion }[1]
-            String value = minorVersion.version
+            String value = lastMinorVersions.get().findAll { it == it.baseVersion }[1].version
             handledProperties[groups[2]] = value
             return "${groups[1]} = ${value}${groups[3]}"
         }
