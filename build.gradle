@@ -72,7 +72,20 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
 
     Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
     RegularFileProperty gradlePropertiesFileProperty = objects.fileProperty().value(layout.projectDirectory.file('gradle.properties'))
+
     ListProperty<GradleVersion> allGradleVersions = objects.listProperty(GradleVersion).value(provider { project.getAllGradleVersions() }).with { it.finalizeValueOnRead(); it }
+    ListProperty<GradleVersion> lastMinorVersions = objects.listProperty(GradleVersion).value(provider {
+        Map<String, GradleVersion> result = [:]
+        allGradleVersions.get().forEach { version ->
+            String minorVer = version.version.replaceFirst(/^(\d+\.\d+).*$/, '$1')
+            result.compute(minorVer) { _, prevVer ->
+                prevVer == null || prevVer > version
+                    ? version
+                    : prevVer
+            }
+        }
+        return result.values().toList()
+    }).with { it.finalizeValueOnRead(); it }
 
     doLast {
         String repositoryName = repositoryNameProperty.getOrNull() ?: ''
@@ -90,10 +103,8 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
         String content = file.getText('UTF-8')
         Map<String, String> handledProperties = [:]
         content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
-            GradleVersion lastMinorVersion = allGradleVersions.get().findAll { GradleVersion ver ->
-                ver == ver.baseVersion && ver.version.count('.') == 1
-            }[1]
-            String value = lastMinorVersion.version
+            GradleVersion minorVersion = lastMinorVersions.get().findAll { it == it.baseVersion }[1]
+            String value = minorVersion.version
             handledProperties[groups[2]] = value
             return "${groups[1]} = ${value}${groups[3]}"
         }
