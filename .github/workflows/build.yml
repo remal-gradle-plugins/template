@@ -208,69 +208,16 @@ jobs:
     - build
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{fromJSON(needs.build.outputs.allMatrixIncludes)}}
     concurrency:
       group: ${{github.workflow}}-cross-versions-tests-${{strategy.job-index||'0'}}-${{github.ref}}
       cancel-in-progress: true
-    env:
-      DISABLE_COMPILATION: 'true'
-      DISABLE_VERIFICATION_EXCEPT_TESTS: 'true'
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v5
+    - name: Gradle + Java
+      uses: ./.github/workflows/build-cross-versions-tests.yml
       with:
-        submodules: recursive
-        fetch-depth: 1
-    - name: Cache Gradle
-      uses: remal-github-actions/cache-gradle@main
-      with:
-        build-cache-for-branches-only: 'true'
-    - name: Setup Java ${{matrix.java != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix.java, env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
-      uses: actions/setup-java@v5
-      with:
-        java-version: |
-          ${{matrix.java != env.DEFAULT_JAVA_VERSION && matrix.java || ''}}
-          ${{env.DEFAULT_JAVA_VERSION}}
-        distribution: temurin
-    - name: Download workspace archive
-      id: download-workspace
-      uses: Wandalen/wretry.action@v3.8.0
-      with:
-        action: actions/download-artifact@v5
-        attempt_limit: 3
-        attempt_delay: 5000
-        with: |
-          name: workspace
-          path: /tmp
-    - name: Unarchive workspace
-      run: |
-        tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
-    - name: Execute tests
-      run: |
-        ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage "-Pjava-runtime.version=${{matrix.java}}" "-Pgradle-api.version=${{matrix.gradle}}"
-    - name: Upload Jacoco merged report
-      if: ${{strategy.job-index == '0'}}
-      uses: actions/upload-artifact@v4
-      with:
-        name: jacoco-merged-report-${{matrix.java}}-${{matrix.gradle}}
-        path: build/reports/jacoco/jacocoReportMerged/
-        if-no-files-found: error
-        retention-days: 30
-    - name: Archive failed test workspace
-      if: ${{failure()}}
-      run: |
-        tar -cz -f "/tmp/workspace-test-${{matrix.java}}-${{matrix.gradle}}-${{github.run_id}}.tar.gz" `git ls-files -m -o`
-    - name: Upload failed test workspace archive
-      if: ${{failure()}}
-      uses: actions/upload-artifact@v4
-      with:
-        name: workspace-test-${{matrix.java}}-${{matrix.gradle}}
-        path: '/tmp/workspace-test-${{matrix.java}}-${{matrix.gradle}}-${{github.run_id}}.tar.gz'
-        if-no-files-found: error
-        retention-days: 7
+        env: ${{toJSON(env)}}
+    # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
+    # $$$sync-with-template-modifiable-end$$$
 
   cross-versions-tests-success:
     needs:
