@@ -129,11 +129,11 @@ jobs:
       uses: remal-github-actions/cache-gradle@main
       with:
         build-cache-for-branches-only: 'true'
-    - name: Setup Java ${{matrix['java-runtime.version'] != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix['java-runtime.version'], env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
+    - name: Setup Java ${{matrix['java-runtime'] != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix['java-runtime'], env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
       uses: actions/setup-java@v5
       with:
         java-version: |
-          ${{matrix['java-runtime.version'] != env.DEFAULT_JAVA_VERSION && matrix['java-runtime.version'] || ''}}
+          ${{matrix['java-runtime'] != env.DEFAULT_JAVA_VERSION && matrix['java-runtime'] || ''}}
           ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
     - name: Download workspace archive
