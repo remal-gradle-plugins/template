@@ -185,6 +185,7 @@ jobs:
               delete envObj[name]
             }
           }
+          core.info(JSON.stringify(envObj, null, '  '))
           return envObj
 
   cross-versions-tests:
