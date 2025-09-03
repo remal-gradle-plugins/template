@@ -86,7 +86,6 @@ jobs:
       repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
       publish-isGradlePlugin: ${{steps.publish-flags.outputs.isGradlePlugin}}
       publish-isMavenCentral: ${{steps.publish-flags.outputs.isMavenCentral}}
-      allMatrixIncludes: ${{steps.matrixVersions.outputs.allMatrixIncludes}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -165,53 +164,28 @@ jobs:
         path: '/tmp/workspace-${{github.run_id}}.tar.gz'
         if-no-files-found: error
         retention-days: 90
-    - name: Read min supported Java version
-      id: min-java-version
-      uses: remal-github-actions/read-property@v1
-      with:
-        file: gradle.properties
-        property: 'java-runtime.min-version'
-    - name: Read min supported Gradle version
-      id: min-gradle-version
-      uses: remal-github-actions/read-property@v1
-      with:
-        file: gradle.properties
-        property: 'gradle-api.min-version'
-    - name: Retrieve matrix versions for testing
-      id: matrixVersions
-      uses: remal-github-actions/matrix-versions@v1
-      with:
-        matrix: |
-          java:
-            dependency: java
-            only:
-            - lts
-            - stable
-            include:
-            - '[${{steps.min-java-version.outputs.value}},)'
-          gradle:
-            dependency: 'maven:name.remal.gradle-api:gradle-api'
-            repositories:
-            - 'https://maven.pkg.github.com/remal-gradle-api/packages'
-            only:
-            - stable-minors+current-unstable
-            include:
-            - '[${{steps.min-gradle-version.outputs.value}},)'
-
 
 
   prepare-env-for-cross-versions-tests:
     outputs:
-      env-json: ${{steps.prepare.outputs.env-json}}
+      env-json: ${{steps.prepare.outputs}}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
     - name: Prepare environment variables for cross-versions-tests
-      id: prepare
+      id: env-json
+      uses: actions/github-script@v7
       env:
         ENV_JSON: ${{toJSON(env)}}
-      run: |
-        echo "env-json=$ENV_JSON" | tee -a $GITHUB_OUTPUT
+      with:
+        script: |
+          const envObj = JSON.parse(process.env.ENV_JSON)
+          for (const name of Object.keys(envObj)) {
+            if (name.startsWith('GITHUB_ACTIONS_')) {
+              delete envObj[name]
+            }
+          }
+          return envObj
 
   cross-versions-tests:
     needs:
@@ -285,9 +259,27 @@ jobs:
     - name: Unarchive workspace
       run: |
         tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
+    - name: Retrieve max tested versions
+      id: maxTestedVersions
+      uses: remal-github-actions/matrix-versions@v1
+      with:
+        matrix: |
+          java:
+            dependency: java
+            only:
+            - once
+            - lts
+            - stable
+          gradle:
+            dependency: 'maven:name.remal.gradle-api:gradle-api'
+            repositories:
+            - 'https://maven.pkg.github.com/remal-gradle-api/packages'
+            only:
+            - once
+            - stable-minors+current-unstable
     - name: Execute push-back tasks
       run: |
-        ./gradlew-retry-connection-timeouts pushBackTasks "-Pjava-runtime.max-version=${{fromJSON(needs.build.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(needs.build.outputs.allMatrixIncludes)[0].gradle}}"
+        ./gradlew-retry-connection-timeouts pushBackTasks "-Pjava-runtime.max-version=${{fromJSON(steps.maxTestedVersions.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(steps.maxTestedVersions.outputs.allMatrixIncludes)[0].gradle}}"
     - name: Push back
       env:
         PUSH_BACK_TOKEN: ${{secrets.PUSH_BACK_TOKEN}}
