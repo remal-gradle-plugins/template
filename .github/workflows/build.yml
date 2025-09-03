@@ -119,16 +119,16 @@ jobs:
         REPOSITORY_LICENSE_NAME: ${{fromJSON(steps.repository-info.outputs.result).license.name}}
         REPOSITORY_LICENSE_HTML_URL: ${{fromJSON(steps.repository-info.outputs.result).license.htmlUrl}}
       run: |
-        echo "REPOSITORY_NAME=$REPOSITORY_NAME" >> "$GITHUB_ENV"
-        echo "REPOSITORY_FULL_NAME=$REPOSITORY_FULL_NAME" >> "$GITHUB_ENV"
-        echo "REPOSITORY_API_URL=$REPOSITORY_API_URL" >> "$GITHUB_ENV"
-        echo "REPOSITORY_HTML_URL=$REPOSITORY_HTML_URL" >> "$GITHUB_ENV"
-        echo "REPOSITORY_DESCRIPTION=$REPOSITORY_DESCRIPTION" >> "$GITHUB_ENV"
-        echo "REPOSITORY_TOPICS=$REPOSITORY_TOPICS" >> "$GITHUB_ENV"
-        echo "REPOSITORY_IS_TEMPLATE=$REPOSITORY_IS_TEMPLATE" >> "$GITHUB_ENV"
-        echo "REPOSITORY_OWNER_NAME=$REPOSITORY_OWNER_NAME" >> "$GITHUB_ENV"
-        echo "REPOSITORY_LICENSE_NAME=$REPOSITORY_LICENSE_NAME" >> "$GITHUB_ENV"
-        echo "REPOSITORY_LICENSE_HTML_URL=$REPOSITORY_LICENSE_HTML_URL" >> "$GITHUB_ENV"
+        echo "REPOSITORY_NAME=$REPOSITORY_NAME" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_FULL_NAME=$REPOSITORY_FULL_NAME" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_API_URL=$REPOSITORY_API_URL" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_HTML_URL=$REPOSITORY_HTML_URL" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_DESCRIPTION=$REPOSITORY_DESCRIPTION" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_TOPICS=$REPOSITORY_TOPICS" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_IS_TEMPLATE=$REPOSITORY_IS_TEMPLATE" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_OWNER_NAME=$REPOSITORY_OWNER_NAME" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_LICENSE_NAME=$REPOSITORY_LICENSE_NAME" | tee -a $GITHUB_ENV
+        echo "REPOSITORY_LICENSE_HTML_URL=$REPOSITORY_LICENSE_HTML_URL" | tee -a $GITHUB_ENV
     - name: Submit dependencies to GitHub
       if: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && startsWith(github.ref, 'refs/heads/')}}
       run: |
@@ -136,7 +136,7 @@ jobs:
     - name: Compile classes
       run: |
         ./gradlew-retry-connection-timeouts allClasses
-        echo "DISABLE_COMPILATION=true" >> "$GITHUB_ENV"
+        echo "DISABLE_COMPILATION=true" | tee -a $GITHUB_ENV
     - name: Build without tests
       run: |
         ./gradlew-retry-connection-timeouts build publishToMavenLocal -Pdisable-tests=true
@@ -144,18 +144,14 @@ jobs:
       id: publish-flags
       run: |
         if [ -f "build/publish-gradle-plugin.flag" ]; then
-          echo "isGradlePlugin = true"
-          echo 'isGradlePlugin=true' >> $GITHUB_OUTPUT
+          echo "isGradlePlugin=true" | tee -a $GITHUB_OUTPUT
         else
-          echo "isGradlePlugin = false"
-          echo 'isGradlePlugin=false' >> $GITHUB_OUTPUT
+          echo "isGradlePlugin=false" | tee -a $GITHUB_OUTPUT
         fi
         if [ -f "build/publish-maven-central.flag" ]; then
-          echo "isMavenCentral = true"
-          echo 'isMavenCentral=true' >> $GITHUB_OUTPUT
+          echo "isMavenCentral=true" | tee -a $GITHUB_OUTPUT
         else
-          echo "isMavenCentral = false"
-          echo 'isMavenCentral=false' >> $GITHUB_OUTPUT
+          echo "isMavenCentral=false" | tee -a $GITHUB_OUTPUT
         fi
     - name: Archive workspace
       if: ${{always()}}
@@ -215,17 +211,17 @@ jobs:
       env:
         ENV_JSON: ${{toJSON(env)}}
       run: |
-        echo 'env-json=$ENV_JSON' >> $GITHUB_OUTPUT
+        echo "env-json=$ENV_JSON" | tee -a $GITHUB_OUTPUT
 
   cross-versions-tests:
     needs:
     - build
     - prepare-env-for-cross-versions-tests
     uses: ./.github/workflows/build-cross-versions-tests.yml
+    secrets: inherit
     with:
       workflow-key: gradle-java
       env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
-    secrets: inherit
 
   # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
   # $$$sync-with-template-modifiable-end$$$
@@ -321,7 +317,7 @@ jobs:
       with:
         script: |
           const tagName = context.payload.ref.replace(/^refs\/tags\//, '')
-          core.info('Git tag: ' + tagName)
+          core.info(`Git tag: ${tagName}``)
           const result = {
             isVersion: !!tagName.match(/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-rc-[1-9]\d*)?$/),
           }
