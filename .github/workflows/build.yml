@@ -209,7 +209,8 @@ jobs:
     uses: ./.github/workflows/build-cross-versions-tests.yml
     with:
       workflow-key: gradle-java
-      env: ${{toJSON(env)}}
+      env-json: ${{toJSON(env)}}
+    secrets: inherit
 
   # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
   # $$$sync-with-template-modifiable-end$$$
