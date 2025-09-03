@@ -203,13 +203,29 @@ jobs:
             - '[${{steps.min-gradle-version.outputs.value}},)'
 
 
+
+  prepare-env-for-cross-versions-tests:
+    outputs:
+      env-json: ${{steps.prepare.outputs.env-json}}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Prepare environment variables for cross-versions-tests
+      id: prepare
+      uses: actions/github-script@v7
+      env:
+        ENV_JSON: ${{toJSON(env)}}
+      run: |
+        echo 'env-json=$ENV_JSON' >> $GITHUB_OUTPUT
+
   cross-versions-tests:
     needs:
     - build
+    - prepare-env-for-cross-versions-tests
     uses: ./.github/workflows/build-cross-versions-tests.yml
     with:
       workflow-key: gradle-java
-      env-json: ${{toJSON(env)}}
+      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
     secrets: inherit
 
   # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
