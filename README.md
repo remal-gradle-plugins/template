@@ -1,4 +1,4 @@
-**Tested on Java LTS versions from <!--property:java-runtime.min-version-->17<!--/property--> to <!--property:java-runtime.max-version-->24<!--/property-->.**
+**Tested on Java LTS versions from <!--property:java-runtime.min-version--><!--/property--> to <!--property:java-runtime.max-version-->24<!--/property-->.**
 
 **Tested on Gradle versions from <!--property:gradle-api.min-version-->8.14<!--/property--> to <!--property:gradle-api.max-version-->9.1.0-rc-1<!--/property-->.**
 
@@ -9,11 +9,13 @@
 Usage:
 
 <!--plugin-usage:name.remal.template-plugin-->
+
 ```groovy
 plugins {
-    id 'name.remal.template-plugin' version '1-SNAPSHOT'
+  id 'name.remal.template-plugin' version '1-SNAPSHOT'
 }
 ```
+
 <!--/plugin-usage-->
 
 &nbsp;
