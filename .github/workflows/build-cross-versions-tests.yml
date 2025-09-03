@@ -98,14 +98,16 @@ jobs:
       with:
         script: |
           const matrix = JSON.parse(process.env.MATRIX)
-          core.setOutput('token', Object.entries(matrix)
+          const token = Object.entries(matrix)
             .map(([name, value]) => `${name}-${value}`)
             .join('-')
-          )
-          core.setOutput('gradle-args', Object.entries(matrix)
+          core.info(`token=${token}`)
+          core.setOutput('token', token)
+          const gradleArgs = Object.entries(matrix)
             .map(([name, value]) => `"-P${name}.version=${value}"`)
             .join(' ')
-          )
+          core.info(`gradle-args=${gradleArgs}`)
+          core.setOutput('gradle-args', gradleArgs)
     - name: Initialize environment variables
       uses: actions/github-script@v7
       env:
