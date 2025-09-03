@@ -113,7 +113,9 @@ jobs:
         script: |
           const parentEnv = JSON.parse(process.env.PARENT_ENV_JSON)
           for (const [name, value] of Object.entries(parentEnv)) {
-            core.exportVariable(name, value)
+            if (process.env[name] == null) {
+              core.exportVariable(name, value)
+            }
           }
           core.exportVariable('DISABLE_COMPILATION', 'true')
           core.exportVariable('DISABLE_VERIFICATION_EXCEPT_TESTS', 'true')
