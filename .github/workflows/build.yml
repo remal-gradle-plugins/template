@@ -77,15 +77,15 @@ jobs:
   build:
     needs:
     - populate-cache
+    outputs:
+      repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
+      publish-isGradlePlugin: ${{steps.publish-flags.outputs.isGradlePlugin}}
+      publish-isMavenCentral: ${{steps.publish-flags.outputs.isMavenCentral}}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
       group: ${{github.workflow}}-build-${{strategy.job-index||'0'}}-${{github.ref}}
       cancel-in-progress: true
-    outputs:
-      repository-isTemplate: ${{fromJSON(steps.repository-info.outputs.result).isTemplate}}
-      publish-isGradlePlugin: ${{steps.publish-flags.outputs.isGradlePlugin}}
-      publish-isMavenCentral: ${{steps.publish-flags.outputs.isMavenCentral}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -260,8 +260,20 @@ jobs:
     - name: Unarchive workspace
       run: |
         tar -xz -f "${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz"
+    - name: Read min supported Java version
+      id: min-java-version
+      uses: remal-github-actions/read-property@v1
+      with:
+        file: gradle.properties
+        property: 'java-runtime.min-version'
+    - name: Read min supported Gradle version
+      id: min-gradle-version
+      uses: remal-github-actions/read-property@v1
+      with:
+        file: gradle.properties
+        property: 'gradle-api.min-version'
     - name: Retrieve max tested versions
-      id: maxTestedVersions
+      id: max-tested-versions
       uses: remal-github-actions/matrix-versions@v1
       with:
         matrix: |
@@ -271,6 +283,8 @@ jobs:
             - once
             - lts
             - stable
+            include:
+            - '[${{steps.min-java-version.outputs.value}},)'
           gradle:
             dependency: 'maven:name.remal.gradle-api:gradle-api'
             repositories:
@@ -278,9 +292,11 @@ jobs:
             only:
             - once
             - stable-minors+current-unstable
+            include:
+            - '[${{steps.min-gradle-version.outputs.value}},)'
     - name: Execute push-back tasks
       run: |
-        ./gradlew-retry-connection-timeouts pushBackTasks "-Pjava-runtime.max-version=${{fromJSON(steps.maxTestedVersions.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(steps.maxTestedVersions.outputs.allMatrixIncludes)[0].gradle}}"
+        ./gradlew-retry-connection-timeouts pushBackTasks "-Pjava-runtime.max-version=${{fromJSON(steps.max-tested-versions.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(steps.max-tested-versions.outputs.allMatrixIncludes)[0].gradle}}"
     - name: Push back
       env:
         PUSH_BACK_TOKEN: ${{secrets.PUSH_BACK_TOKEN}}
