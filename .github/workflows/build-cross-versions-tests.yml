@@ -17,6 +17,8 @@ on:
         description: Matrix definition for remal-github-actions/matrix-versions action.
       java-gradle-only-once:
         type: boolean
+        required: false
+        default: 'true'
         description: >-
           Set to `true` to add `only: once` to Java and Gradle dependencies
           for remal-github-actions/matrix-versions action.
