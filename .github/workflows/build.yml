@@ -212,7 +212,6 @@ jobs:
     steps:
     - name: Prepare environment variables for cross-versions-tests
       id: prepare
-      uses: actions/github-script@v7
       env:
         ENV_JSON: ${{toJSON(env)}}
       run: |
