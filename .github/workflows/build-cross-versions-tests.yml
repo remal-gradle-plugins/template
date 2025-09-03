@@ -3,6 +3,10 @@ name: 'build: build-cross-versions-tests'
 on:
   workflow_call:
     inputs:
+      workflow-key:
+        type: string
+        required: true
+        description: Workflow key
       env:
         type: string
         required: true
@@ -70,6 +74,9 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{fromJSON(needs.create-matrix.outputs.matrix-includes)}}
+    concurrency:
+      group: ${{github.workflow}}-cross-versions-tests-${{inputs.workflow-key}}-${{strategy.job-index||'0'}}-${{github.ref}}
+      cancel-in-progress: true
     steps:
     - name: Create matrix info
       id: matrix-info
