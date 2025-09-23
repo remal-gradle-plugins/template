@@ -105,12 +105,6 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
         String content = file.getText('UTF-8')
         Map<String, String> handledProperties = [:]
 
-        content = content.replaceFirst(/((?:^|[\r\n]\s*)(java-runtime.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
-            String value = javaLtsVersions.get()[1]
-            handledProperties[groups[2]] = value
-            return "${groups[1]} = ${value}${groups[3]}"
-        }
-
         content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
             String value = lastMinorVersions.get().findAll { it == it.baseVersion }[1].version
             handledProperties[groups[2]] = value
