@@ -29,7 +29,8 @@ apply plugin: 'name.remal.toolkit.build-logic'
 
 apply plugin: 'java-gradle-plugin'
 
-dependencies {}
+dependencies {
+}
 
 gradlePlugin {
     plugins {
@@ -79,7 +80,10 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
         Map<String, GradleVersion> result = [:]
         allGradleVersions.get().forEach { version ->
             String minorVer = version.version.replaceFirst(/^(\d+\.\d+).*$/, '$1')
-            result.compute(minorVer) { _, prevVer -> prevVer == null || prevVer > version ? version : prevVer
+            result.compute(minorVer) { _, prevVer ->
+                prevVer == null || prevVer > version
+                    ? version
+                    : prevVer
             }
         }
         return result.values().toList()
@@ -101,6 +105,12 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
         String content = file.getText('UTF-8')
         Map<String, String> handledProperties = [:]
 
+        content = content.replaceFirst(/((?:^|[\r\n]\s*)(java-runtime.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+            String value = javaLtsVersions.get()[1]
+            handledProperties[groups[2]] = value
+            return "${groups[1]} = ${value}${groups[3]}"
+        }
+
         content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
             String value = lastMinorVersions.get().findAll { it == it.baseVersion }[1].version
             handledProperties[groups[2]] = value
@@ -112,7 +122,8 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
             return currentValue == entry.value
         }
 
-        handledProperties.keySet().forEach { key -> println "  Changing property: $key"
+        handledProperties.keySet().forEach { key ->
+            println "  Changing property: $key"
         }
 
         if (!handledProperties.isEmpty()) {
