@@ -102,7 +102,7 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{fromJSON(needs.create-matrix.outputs.matrix-includes)}}
-    runs-on: ${{inputs.os || 'ubuntu'}}-latest
+    runs-on: ${{inputs.os}}-latest
     timeout-minutes: 60
     env:
       GITHUB_ACTIONS_JOB: ${{github.job}}
@@ -183,7 +183,7 @@ jobs:
     - name: Archive failed test workspace
       if: ${{failure()}}
       run: |
-        tar -cz -f "/tmp/workspace-test-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz" `git ls-files -m -o`
+        tar -cz -f "/tmp/workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz" `git ls-files -m -o`
     - name: Upload failed test workspace archive
       if: ${{failure()}}
       uses: actions/upload-artifact@v4
