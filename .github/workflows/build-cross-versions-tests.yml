@@ -96,6 +96,8 @@ jobs:
       GITHUB_ACTIONS_JOB: ${{github.job}}
       GITHUB_ACTIONS_JOB_INDEX: ${{github.job_index||'0'}}
     steps:
+    - run: |
+        echo "concurrency: ${{github.workflow}}-cross-versions-tests-${{inputs.workflow-key}}-${{strategy.job-index||'0'}}-${{github.ref}}"
     - name: Create matrix info
       id: matrix-info
       uses: actions/github-script@v8
