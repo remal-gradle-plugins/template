@@ -200,12 +200,39 @@ jobs:
       java-gradle-only-once: false
 
   # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
+  cross-versions-tests-windows:
+    needs:
+    - build
+    - prepare-env-for-cross-versions-tests
+    uses: ./.github/workflows/build-cross-versions-tests.yml
+    secrets: inherit
+    with:
+      workflow-key: gradle-java-windows
+      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
+      os: windows
+      java-gradle-only-once: true
+      gradle-stable-only: false
+
+  cross-versions-tests-macos:
+    needs:
+    - build
+    - prepare-env-for-cross-versions-tests
+    uses: ./.github/workflows/build-cross-versions-tests.yml
+    secrets: inherit
+    with:
+      workflow-key: gradle-java-macos
+      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
+      os: macos
+      java-gradle-only-once: true
+      gradle-stable-only: false
   # $$$sync-with-template-modifiable-end$$$
 
   cross-versions-tests-success:
     needs:
     - cross-versions-tests
     # $$$sync-with-template-modifiable: cross-versions-additional-tests-dependents $$$
+    - cross-versions-tests-windows
+    - cross-versions-tests-macos
     # $$$sync-with-template-modifiable-end$$$
     runs-on: ubuntu-latest
     timeout-minutes: 5

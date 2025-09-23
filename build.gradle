@@ -29,8 +29,7 @@ apply plugin: 'name.remal.toolkit.build-logic'
 
 apply plugin: 'java-gradle-plugin'
 
-dependencies {
-}
+dependencies {}
 
 gradlePlugin {
     plugins {
@@ -80,10 +79,7 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
         Map<String, GradleVersion> result = [:]
         allGradleVersions.get().forEach { version ->
             String minorVer = version.version.replaceFirst(/^(\d+\.\d+).*$/, '$1')
-            result.compute(minorVer) { _, prevVer ->
-                prevVer == null || prevVer > version
-                    ? version
-                    : prevVer
+            result.compute(minorVer) { _, prevVer -> prevVer == null || prevVer > version ? version : prevVer
             }
         }
         return result.values().toList()
@@ -116,8 +112,7 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
             return currentValue == entry.value
         }
 
-        handledProperties.keySet().forEach { key ->
-            println "  Changing property: $key"
+        handledProperties.keySet().forEach { key -> println "  Changing property: $key"
         }
 
         if (!handledProperties.isEmpty()) {
