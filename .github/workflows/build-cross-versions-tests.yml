@@ -176,7 +176,7 @@ jobs:
       if: ${{strategy.job-index == '0'}}
       uses: actions/upload-artifact@v4
       with:
-        name: jacoco-merged-report-${{steps.matrix-info.outputs.token}}
+        name: jacoco-merged-report-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
         path: build/reports/jacoco/jacocoReportMerged/
         if-no-files-found: error
         retention-days: 30
@@ -189,6 +189,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: workspace-test-${{steps.matrix-info.outputs.token}}
-        path: '${{runner.temp}}/workspace-test-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz'
+        path: '${{runner.temp}}/workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz'
         if-no-files-found: error
         retention-days: 7
