@@ -211,7 +211,7 @@ jobs:
       env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
       os: windows
       java-gradle-only-once: true
-      gradle-stable-only: false
+      gradle-stable-only: true
 
   cross-versions-tests-macos:
     needs:
@@ -224,15 +224,15 @@ jobs:
       env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
       os: macos
       java-gradle-only-once: true
-      gradle-stable-only: false
+      gradle-stable-only: true
   # $$$sync-with-template-modifiable-end$$$
 
   cross-versions-tests-success:
     needs:
     - cross-versions-tests
     # $$$sync-with-template-modifiable: cross-versions-additional-tests-dependents $$$
-    - cross-versions-tests-macos
     - cross-versions-tests-windows
+    - cross-versions-tests-macos
     # $$$sync-with-template-modifiable-end$$$
     runs-on: ubuntu-latest
     timeout-minutes: 5
