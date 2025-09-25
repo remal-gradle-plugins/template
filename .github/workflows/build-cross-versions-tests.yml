@@ -56,6 +56,7 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 1
+
     - name: Read min supported Java version
       id: min-java-version
       uses: remal-github-actions/read-property@v1
@@ -92,86 +93,18 @@ jobs:
             include:
             - '[${{steps.min-gradle-version.outputs.value}},)'
 
-  cross-versions-tests:
+  tests:
     needs:
     - create-matrix
-    concurrency:
-      group: ${{github.workflow}}-cross-versions-tests-${{inputs.workflow-key}}-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
         include: ${{fromJSON(needs.create-matrix.outputs.matrix-includes)}}
-    runs-on: ${{inputs.os}}-latest
-    timeout-minutes: 60
-    env:
-      GITHUB_ACTIONS_JOB: ${{github.job}}
-      GITHUB_ACTIONS_JOB_INDEX: ${{github.job_index||'0'}}
-    steps:
-    - name: Create matrix info
-      id: matrix-info
-      uses: actions/github-script@v8
-      env:
-        MATRIX: ${{toJSON(matrix)}}
-      with:
-        script: |
-          const matrix = JSON.parse(process.env.MATRIX)
-          const token = Object.entries(matrix)
-            .map(([name, value]) => `${name}-${value}`)
-            .join('-')
-          core.info(`token=${token}`)
-          core.setOutput('token', token)
-          const gradleArgs = Object.entries(matrix)
-            .map(([name, value]) => `"-P${name}.version=${value}"`)
-            .join(' ')
-          core.info(`gradle-args=${gradleArgs}`)
-          core.setOutput('gradle-args', gradleArgs)
-    - name: Initialize environment variables
-      uses: actions/github-script@v8
-      env:
-        PARENT_ENV_JSON: ${{inputs.env-json}}
-      with:
-        script: |
-          const parentEnv = JSON.parse(process.env.PARENT_ENV_JSON)
-          for (const [name, value] of Object.entries(parentEnv)) {
-            if (process.env[name] == null) {
-              core.exportVariable(name, value)
-            }
-          }
-          core.exportVariable('DISABLE_COMPILATION', 'true')
-          core.exportVariable('DISABLE_VERIFICATION_EXCEPT_TESTS', 'true')
-    - name: Checkout repository
-      uses: actions/checkout@v5
-      with:
-        submodules: recursive
-        fetch-depth: 1
-    - name: Cache Gradle
-      uses: remal-github-actions/cache-gradle@main
-      with:
-        build-cache-for-branches-only: 'true'
-    - name: Setup Java ${{matrix['java-runtime'] != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix['java-runtime'], env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
-      uses: actions/setup-java@v5
-      with:
-        java-version: |
-          ${{matrix['java-runtime'] != env.DEFAULT_JAVA_VERSION && matrix['java-runtime'] || ''}}
-          ${{env.DEFAULT_JAVA_VERSION}}
-        distribution: temurin
-    - name: Download and extract workspace
-      uses: ./.github/workflows/actions/download-extract-workspace
-    - name: Execute tests
-      run: |
-        ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
-    - name: Upload Jacoco merged report
-      if: ${{(strategy.job-index || '0') == '0'}}
-      uses: actions/upload-artifact@v4
-      with:
-        name: jacoco-merged-report-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
-        path: build/reports/jacoco/jacocoReportMerged/
-        if-no-files-found: error
-        retention-days: 30
-    - name: Archive and upload test workspace
-      if: ${{failure()}}
-      uses: ./.github/workflows/actions/archive-upload-workspace
-      with:
-        archive-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
-        artifact-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
+    uses: ./.github/workflows/build-tests.yml
+    secrets: inherit
+    with:
+      workflow-key: ${{inputs.workflow-key}}
+      os: ${{inputs.os}}
+      job-matrix-json: ${{toJSON(matrix)}}
+      job-index: ${{github.job_index||'0'}}
+      env-json: ${{inputs.env-json}}

@@ -58,6 +58,7 @@ jobs:
       with:
         lookup-only: 'true'
         build-cache-enabled: 'false'
+
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       uses: actions/setup-java@v5
@@ -102,6 +103,7 @@ jobs:
         java-version: |
           ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+
     - name: Retrieve repository info
       id: repository-info
       uses: remal-github-actions/retrieve-repository-info@v1
@@ -128,10 +130,12 @@ jobs:
         echo "REPOSITORY_OWNER_NAME=$REPOSITORY_OWNER_NAME" | tee -a $GITHUB_ENV
         echo "REPOSITORY_LICENSE_NAME=$REPOSITORY_LICENSE_NAME" | tee -a $GITHUB_ENV
         echo "REPOSITORY_LICENSE_HTML_URL=$REPOSITORY_LICENSE_HTML_URL" | tee -a $GITHUB_ENV
+
     - name: Submit dependencies to GitHub
       if: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && startsWith(github.ref, 'refs/heads/')}}
       run: |
         ./gradlew-retry-connection-timeouts githubSubmitDependencies
+
     - name: Compile classes
       run: |
         ./gradlew-retry-connection-timeouts allClasses
@@ -139,6 +143,7 @@ jobs:
     - name: Build without tests
       run: |
         ./gradlew-retry-connection-timeouts build publishToMavenLocal -Pdisable-tests=true
+
     - name: Read publish flags
       id: publish-flags
       run: |
@@ -268,6 +273,7 @@ jobs:
         distribution: temurin
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
+
     - name: Read min supported Java version
       id: min-java-version
       uses: remal-github-actions/read-property@v1
@@ -302,9 +308,11 @@ jobs:
             - stable-minors+current-unstable
             include:
             - '[${{steps.min-gradle-version.outputs.value}},)'
+
     - name: Execute push-back tasks
       run: |
         ./gradlew-retry-connection-timeouts pushBackTasks "-Pjava-runtime.max-version=${{fromJSON(steps.max-tested-versions.outputs.allMatrixIncludes)[0].java}}" "-Pgradle-api.max-version=${{fromJSON(steps.max-tested-versions.outputs.allMatrixIncludes)[0].gradle}}"
+
     - name: Push back
       env:
         PUSH_BACK_TOKEN: ${{secrets.PUSH_BACK_TOKEN}}
@@ -378,6 +386,7 @@ jobs:
         distribution: temurin
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
+
     - name: Publish to Gradle Plugin Portal
       run: |
         ./gradlew-retry-connection-timeouts publishPlugins "-Pgradle.publish.key=${{secrets.GRADLE_PLUGINS_PORTAL_KEY}}" "-Pgradle.publish.secret=${{secrets.GRADLE_PLUGINS_PORTAL_SECRET}}"
@@ -422,6 +431,7 @@ jobs:
         distribution: temurin
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
+
     - name: Publish to Maven Central
       run: |
         ./gradlew-retry-connection-timeouts publishToSonatype closeAndReleaseSonatypeStagingRepository "-PsonatypeUsername=${{secrets.OSS_USER}}" "-PsonatypePassword=${{secrets.OSS_PASSWORD}}" "-Psigning.key=${{secrets.SIGNING_SECRET_KEY_RING}}" "-Psigning.keyId=${{secrets.SIGNING_KEY_ID}}" "-Psigning.password=${{secrets.SIGNING_PASSWORD}}"

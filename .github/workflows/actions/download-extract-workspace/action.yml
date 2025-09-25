@@ -39,4 +39,11 @@ runs:
     run: |
       archive="${{fromJSON(steps.download.outputs.outputs).download-path}}/${{inputs.archive-name}}.tar.gz"
       echo "file=$archive" | tee -a $GITHUB_OUTPUT
-      tar --extract --gzip "--file=$archive" --force-local
+
+      extra=()
+      if tar --version 2>/dev/null | grep -q 'GNU tar'; then
+        extra+=(--force-local)
+      fi
+
+      tar --extract --gzip --file="$archive" "${extra[@]}"
+
