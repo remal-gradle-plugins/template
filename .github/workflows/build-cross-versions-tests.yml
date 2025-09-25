@@ -5,7 +5,7 @@ on:
     inputs:
       os:
         type: string
-        required: true
+        required: false
         default: ubuntu
         description: Operation system to test against.
       workflow-key:

@@ -3,11 +3,11 @@ description: Downloads and extracts a workflow artifact containing a gzipped tar
 
 inputs:
   archive-name:
-    required: true
+    required: false
     default: workspace-${{github.run_id}}
     description: Archive file name without extension
   artifact-name:
-    required: true
+    required: false
     default: workspace
     description: Artifact name
 

@@ -3,15 +3,15 @@ description: Archives changed and uncommitted files to a gzipped tar archive fil
 
 inputs:
   archive-name:
-    required: true
+    required: false
     default: workspace-${{github.run_id}}
     description: Archive file name without extension
   artifact-name:
-    required: true
+    required: false
     default: workspace
     description: Artifact name
   artifact-retention-days:
-    required: true
+    required: false
     default: 90
     description: Artifact retention days
 
