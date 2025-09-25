@@ -3,15 +3,15 @@ name: 'build: build-cross-versions-tests'
 on:
   workflow_call:
     inputs:
+      workflow-key:
+        type: string
+        required: true
+        description: Workflow key.
       os:
         type: string
         required: false
         default: ubuntu
         description: Operation system to test against.
-      workflow-key:
-        type: string
-        required: true
-        description: Workflow key.
       env-json:
         type: string
         required: false

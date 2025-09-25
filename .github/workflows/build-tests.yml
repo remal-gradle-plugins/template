@@ -7,6 +7,16 @@ on:
         type: string
         required: true
         description: Workflow key.
+      os:
+        type: string
+        required: false
+        default: ubuntu
+        description: Operation system to test against.
+      job-index:
+        type: number
+        required: true
+        default: 0
+        description: Matrix job index.
       env-json:
         type: string
         required: false
@@ -15,11 +25,6 @@ on:
       versions-matrix-spec:
         type: string
         description: Matrix definition for remal-github-actions/matrix-versions action.
-      os:
-        type: string
-        required: false
-        default: 'ubuntu'
-        description: Operation system to test against.
       java-gradle-only-once:
         type: boolean
         required: false
@@ -45,59 +50,7 @@ env:
   GITHUB_ACTIONS_RUN_ATTEMPT: ${{github.run_attempt}}
 
 jobs:
-  create-matrix:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      matrix-includes: ${{steps.matrix-versions.outputs.allMatrixIncludes}}
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v5
-      with:
-        submodules: recursive
-        fetch-depth: 1
-    - name: Read min supported Java version
-      id: min-java-version
-      uses: remal-github-actions/read-property@v1
-      with:
-        file: gradle.properties
-        property: 'java-runtime.min-version'
-    - name: Read min supported Gradle version
-      id: min-gradle-version
-      uses: remal-github-actions/read-property@v1
-      with:
-        file: gradle.properties
-        property: 'gradle-api.min-version'
-    - name: Retrieve matrix versions for testing
-      id: matrix-versions
-      uses: remal-github-actions/matrix-versions@v1
-      with:
-        matrix: |
-          ${{inputs.versions-matrix-spec || ''}}
-          java-runtime:
-            dependency: java
-            only:
-            - lts
-            - stable
-            ${{inputs.java-gradle-only-once && '- once' || ''}}
-            include:
-            - '[${{steps.min-java-version.outputs.value}},)'
-          gradle-api:
-            dependency: 'maven:name.remal.gradle-api:gradle-api'
-            repositories:
-            - 'https://maven.pkg.github.com/remal-gradle-api/packages'
-            only:
-            - ${{inputs.gradle-stable-only && 'stable-minors' || 'stable-minors+current-unstable'}}
-            ${{inputs.java-gradle-only-once && '- once' || ''}}
-            include:
-            - '[${{steps.min-gradle-version.outputs.value}},)'
-
-  cross-versions-tests:
-    needs:
-    - create-matrix
-    concurrency:
-      group: ${{github.workflow}}-cross-versions-tests-${{inputs.workflow-key}}-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
+  tests:
     strategy:
       fail-fast: false
       matrix:
@@ -106,7 +59,7 @@ jobs:
     timeout-minutes: 60
     env:
       GITHUB_ACTIONS_JOB: ${{github.job}}
-      GITHUB_ACTIONS_JOB_INDEX: ${{github.job_index||'0'}}
+      GITHUB_ACTIONS_JOB_INDEX: ${{inputs.job-index}}
     steps:
     - name: Create matrix info
       id: matrix-info
