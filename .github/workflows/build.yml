@@ -200,14 +200,12 @@ jobs:
     needs:
     - build
     - prepare-env-for-cross-versions-tests
-    uses: ./.github/workflows/build-cross-versions-tests.yml
+    uses: ./.github/workflows/build-tests.yml
     secrets: inherit
     with:
       workflow-key: gradle-java-windows
-      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
       os: windows
-      java-gradle-only-once: true
-      gradle-stable-only: true
+      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
 
   cross-versions-tests-macos:
     needs:
