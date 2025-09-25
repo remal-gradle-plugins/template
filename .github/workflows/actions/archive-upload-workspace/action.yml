@@ -40,7 +40,7 @@ runs:
       echo "file=$archive" | tee -a $GITHUB_OUTPUT
 
       listFile="$(mktemp)"
-      git ls-files --modified --others -z >"$list"
+      git ls-files --modified --others -z > "$listFile"
 
       if [ -s "$listFile" ]; then
           tar --create --gzip --no-recursion "--file=$archive" --null -T "$listFile"

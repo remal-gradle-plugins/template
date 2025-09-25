@@ -3,6 +3,10 @@ name: 'build: build-cross-versions-tests'
 on:
   workflow_call:
     inputs:
+      os:
+        type: string
+        required: true
+        description: Operation system to test against.
       workflow-key:
         type: string
         required: true
@@ -15,11 +19,6 @@ on:
       versions-matrix-spec:
         type: string
         description: Matrix definition for remal-github-actions/matrix-versions action.
-      os:
-        type: string
-        required: false
-        default: 'ubuntu'
-        description: Operation system to test against.
       java-gradle-only-once:
         type: boolean
         required: false
@@ -46,7 +45,7 @@ env:
 
 jobs:
   create-matrix:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.os}}-latest
     timeout-minutes: 10
     outputs:
       matrix-includes: ${{steps.matrix-versions.outputs.allMatrixIncludes}}
