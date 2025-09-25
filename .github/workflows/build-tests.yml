@@ -1,4 +1,4 @@
-name: 'build: build-cross-versions-tests'
+name: 'build: build-tests'
 
 on:
   workflow_call:
@@ -156,22 +156,39 @@ jobs:
           ${{matrix['java-runtime'] != env.DEFAULT_JAVA_VERSION && matrix['java-runtime'] || ''}}
           ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
-    - name: Download and extract workspace
-      uses: ./.github/workflows/actions/download-extract-workspace
+    - name: Download workspace archive
+      id: download-workspace
+      uses: Wandalen/wretry.action@v3.8.0
+      with:
+        action: actions/download-artifact@v5
+        attempt_limit: 3
+        attempt_delay: 5000
+        with: |
+          name: workspace
+          path: ${{runner.temp}}
+    - name: Unarchive workspace
+      run: |
+        tar --extract --gzip "--file=${{fromJSON(steps.download-workspace.outputs.outputs).download-path}}/workspace-${{github.run_id}}.tar.gz" --force-local
     - name: Execute tests
       run: |
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
     - name: Upload Jacoco merged report
-      if: ${{(strategy.job-index || '0') == '0'}}
+      if: ${{strategy.job-index == '0'}}
       uses: actions/upload-artifact@v4
       with:
         name: jacoco-merged-report-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
         path: build/reports/jacoco/jacocoReportMerged/
         if-no-files-found: error
         retention-days: 30
-    - name: Archive and upload test workspace
+    - name: Archive failed test workspace
       if: ${{failure()}}
-      uses: ./.github/workflows/actions/archive-upload-workspace
+      run: |
+        tar --create --gzip --no-recursion "--file=${{runner.temp}}/workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz" `git ls-files -m -o`
+    - name: Upload failed test workspace archive
+      if: ${{failure()}}
+      uses: actions/upload-artifact@v4
       with:
-        archive-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
-        artifact-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
+        name: workspace-test-${{steps.matrix-info.outputs.token}}
+        path: '${{runner.temp}}/workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.run_id}}.tar.gz'
+        if-no-files-found: error
+        retention-days: 7
