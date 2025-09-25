@@ -6,6 +6,7 @@ on:
       os:
         type: string
         required: true
+        default: ubuntu
         description: Operation system to test against.
       workflow-key:
         type: string
