@@ -78,9 +78,11 @@ jobs:
           const parentEnv = JSON.parse(process.env.PARENT_ENV_JSON)
           for (const [name, value] of Object.entries(parentEnv)) {
             if (process.env[name] == null) {
+              process.env[name] = value
               core.exportVariable(name, value)
             }
           }
+          core.exportVariable('CURRENT_JAVA_VERSION', ${{fromJSON(inputs.job-matrix-json)['java-runtime'] || ''}} || process.env.DEFAULT_JAVA_VERSION || '')
           core.exportVariable('DISABLE_COMPILATION', 'true')
           core.exportVariable('DISABLE_VERIFICATION_EXCEPT_TESTS', 'true')
     - name: Checkout repository
@@ -94,11 +96,11 @@ jobs:
         build-cache-for-branches-only: 'true'
         strategy-job-index: ${{inputs.strategy-job-index}}
         strategy-job-total: ${{inputs.strategy-job-total}}
-    - name: Setup Java ${{fromJSON(inputs.job-matrix-json)['java-runtime'] && fromJSON(inputs.job-matrix-json)['java-runtime'] != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix['java-runtime'], env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
+    - name: Setup Java ${{env.CURRENT_JAVA_VERSION != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', env.CURRENT_JAVA_VERSION, env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
       uses: actions/setup-java@v5
       with:
         java-version: |
-          ${{fromJSON(inputs.job-matrix-json)['java-runtime'] && fromJSON(inputs.job-matrix-json)['java-runtime'] != env.DEFAULT_JAVA_VERSION && fromJSON(inputs.job-matrix-json)['java-runtime'] || ''}}
+          ${{env.CURRENT_JAVA_VERSION != env.DEFAULT_JAVA_VERSION && env.CURRENT_JAVA_VERSION || ''}}
           ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
     - name: Download and extract workspace
