@@ -24,7 +24,7 @@ runs:
   steps:
   - name: Download workspace archive
     id: download-workspace
-    uses: Wandalen/wretry.action@v3.8.0
+    uses: Wandalen/wretry.action/main@v3.8.0
     with:
       action: actions/download-artifact@v5
       attempt_limit: 3
