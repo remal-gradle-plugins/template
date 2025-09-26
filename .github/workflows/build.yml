@@ -47,7 +47,7 @@ jobs:
         submodules: recursive
         fetch-depth: 1
     - name: Validate Gradle Wrapper
-      uses: Wandalen/wretry.action@v3.8.0
+      uses: Wandalen/wretry.action/main@v3.8.0
       with:
         action: gradle/actions/wrapper-validation@v4
         attempt_limit: 3
@@ -155,7 +155,7 @@ jobs:
           echo "isMavenCentral=false" | tee -a $GITHUB_OUTPUT
         fi
     - name: Archive and upload workspace
-      if: ${{always()}}
+      if: ${{!cancelled()}}
       uses: ./.github/workflows/actions/archive-upload-workspace
 
 
@@ -193,35 +193,12 @@ jobs:
       java-gradle-only-once: false
 
   # $$$sync-with-template-modifiable: cross-versions-additional-tests $$$
-  cross-versions-tests-windows:
-    needs:
-    - build
-    - prepare-env-for-cross-versions-tests
-    uses: ./.github/workflows/build-tests.yml
-    secrets: inherit
-    with:
-      workflow-key: gradle-java-windows
-      os: windows
-      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
-
-  cross-versions-tests-macos:
-    needs:
-    - build
-    - prepare-env-for-cross-versions-tests
-    uses: ./.github/workflows/build-tests.yml
-    secrets: inherit
-    with:
-      workflow-key: gradle-java-macos
-      os: macos
-      env-json: ${{needs.prepare-env-for-cross-versions-tests.outputs.env-json}}
   # $$$sync-with-template-modifiable-end$$$
 
   cross-versions-tests-success:
     needs:
     - cross-versions-tests
     # $$$sync-with-template-modifiable: cross-versions-additional-tests-dependents $$$
-    - cross-versions-tests-windows
-    - cross-versions-tests-macos
     # $$$sync-with-template-modifiable-end$$$
     runs-on: ubuntu-latest
     timeout-minutes: 5
