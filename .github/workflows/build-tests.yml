@@ -82,7 +82,7 @@ jobs:
               core.exportVariable(name, value)
             }
           }
-          core.exportVariable('CURRENT_JAVA_VERSION', ${{fromJSON(inputs.job-matrix-json)['java-runtime'] || ''}} || process.env.DEFAULT_JAVA_VERSION || '')
+          core.exportVariable('CURRENT_JAVA_VERSION', '${{fromJSON(inputs.job-matrix-json)['java-runtime'] || ''}}' || process.env.DEFAULT_JAVA_VERSION || '')
           core.exportVariable('DISABLE_COMPILATION', 'true')
           core.exportVariable('DISABLE_VERIFICATION_EXCEPT_TESTS', 'true')
     - name: Checkout repository
