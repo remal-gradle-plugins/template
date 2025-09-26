@@ -61,7 +61,7 @@ jobs:
           const matrix = JSON.parse(process.env.MATRIX)
           const token = Object.entries(matrix)
             .map(([name, value]) => `${name}-${value}`)
-            .join('-') || 'default
+            .join('-') || 'default'
           core.info(`token=${token}`)
           core.setOutput('token', token)
           const gradleArgs = Object.entries(matrix)
