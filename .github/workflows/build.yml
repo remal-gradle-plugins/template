@@ -12,6 +12,10 @@ on:
   - cron: '2 7 * * *' # sync-with-template: adjust
   workflow_dispatch: { }
 
+concurrency:
+  group: build-${{github.ref}}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -37,9 +41,6 @@ jobs:
       }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    concurrency:
-      group: ${{github.workflow}}-populate-cache-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -84,9 +85,6 @@ jobs:
       publish-isMavenCentral: ${{steps.publish-flags.outputs.isMavenCentral}}
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    concurrency:
-      group: ${{github.workflow}}-build-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -248,9 +246,6 @@ jobs:
     - cross-versions-tests-success
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    concurrency:
-      group: ${{github.workflow}}-push-back-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
     env:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION: 'true'
@@ -328,9 +323,6 @@ jobs:
     - cross-versions-tests-success
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    concurrency:
-      group: ${{github.workflow}}-parse-git-tag-${{strategy.job-index||'0'}}-${{github.ref}}
-      cancel-in-progress: true
     outputs:
       isVersion: ${{fromJSON(steps.parse-git-tag.outputs.result).isVersion}}
     steps:
@@ -362,7 +354,6 @@ jobs:
     - parse-git-tag
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    concurrency: publish-to-gradle-plugins-portal
     env:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION: 'true'
@@ -407,7 +398,6 @@ jobs:
     - parse-git-tag
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    concurrency: publish-to-maven-central
     env:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION: 'true'
