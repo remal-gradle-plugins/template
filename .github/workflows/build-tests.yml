@@ -43,12 +43,14 @@ env:
   GITHUB_ACTIONS_RUN_ATTEMPT: ${{github.run_attempt}}
 
 jobs:
-  matrix-info:
-    outputs:
-      token: ${{steps.matrix-info.outputs.token}}
-      gradle-args: ${{steps.matrix-info.outputs.gradle-args}}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+  tests:
+    name: ${{inputs.os}}-${{inputs.job-matrix-json}}
+    runs-on: ${{inputs.os}}-latest
+    timeout-minutes: 60
+    env:
+      GITHUB_ACTIONS_JOB: ${{github.job}}
+      GITHUB_ACTIONS_JOB_INDEX: ${{inputs.strategy-job-index}}
+      GITHUB_ACTIONS_JOB_TOTAL: ${{inputs.strategy-job-total}}
     steps:
     - name: Create matrix info
       id: matrix-info
@@ -68,18 +70,6 @@ jobs:
             .join(' ')
           core.info(`gradle-args=${gradleArgs}`)
           core.setOutput('gradle-args', gradleArgs)
-
-  tests:
-    needs:
-    - matrix-info
-    name: ${{inputs.os}}-${{needs.matrix-info.outputs.token}}
-    runs-on: ${{inputs.os}}-latest
-    timeout-minutes: 60
-    env:
-      GITHUB_ACTIONS_JOB: ${{github.job}}
-      GITHUB_ACTIONS_JOB_INDEX: ${{inputs.strategy-job-index}}
-      GITHUB_ACTIONS_JOB_TOTAL: ${{inputs.strategy-job-total}}
-    steps:
     - name: Initialize environment variables
       uses: actions/github-script@v8
       env:
@@ -119,13 +109,13 @@ jobs:
 
     - name: Execute tests
       run: |
-        ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{needs.matrix-info.outputs.gradle-args}}
+        ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
 
     - name: Upload Jacoco merged report
       if: ${{(inputs.strategy-job-index || '0') == '0'}}
       uses: actions/upload-artifact@v4
       with:
-        name: jacoco-merged-report-${{inputs.os}}-${{needs.matrix-info.outputs.token}}
+        name: jacoco-merged-report-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
         path: build/reports/jacoco/jacocoReportMerged/
         if-no-files-found: warn
         retention-days: 90
@@ -133,5 +123,5 @@ jobs:
       if: ${{failure()}}
       uses: ./.github/workflows/actions/archive-upload-workspace
       with:
-        archive-name: workspace-test-${{inputs.os}}-${{needs.matrix-info.outputs.token}}
-        artifact-name: workspace-test-${{inputs.os}}-${{needs.matrix-info.outputs.token}}
+        archive-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
+        artifact-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
