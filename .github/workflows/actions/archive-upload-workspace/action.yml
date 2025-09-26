@@ -18,22 +18,22 @@ inputs:
 outputs:
   archive-file:
     description: Created archive file.
-    value: ${{steps.archive.outputs.file}}
+    value: ${{steps.archive-workspace.outputs.file}}
   artifact-id:
     description: A unique identifier for the artifact that was just uploaded. Empty if the artifact upload failed.
-    value: ${{steps.upload.outputs.artifact-id}}
+    value: ${{steps.upload-workspace.outputs.artifact-id}}
   artifact-url:
     description: A download URL for the artifact that was just uploaded. Empty if the artifact upload failed.
-    value: ${{steps.upload.outputs.artifact-url}}
+    value: ${{steps.upload-workspace.outputs.artifact-url}}
   artifact-digest:
     description: SHA-256 digest for the artifact that was just uploaded. Empty if the artifact upload failed.
-    value: ${{steps.upload.outputs.artifact-digest}}
+    value: ${{steps.upload-workspace.outputs.artifact-digest}}
 
 runs:
   using: composite
   steps:
   - name: Archive workspace
-    id: archive
+    id: archive-workspace
     shell: bash
     run: |
       archive="${{runner.temp}}/${{inputs.archive-name}}.tar.gz"
@@ -54,6 +54,6 @@ runs:
     uses: actions/upload-artifact@v4
     with:
       name: ${{inputs.artifact-name}}
-      path: ${{steps.archive.outputs.file}}
+      path: ${{steps.archive-workspace.outputs.file}}
       if-no-files-found: error
       retention-days: ${{inputs.artifact-retention-days}}
