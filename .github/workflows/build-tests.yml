@@ -19,7 +19,7 @@ on:
         description: Job matrix encoded as JSON.
       job-index:
         type: number
-        required: true
+        required: false
         default: 0
         description: Matrix job index.
       env-json:
