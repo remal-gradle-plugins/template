@@ -17,11 +17,16 @@ on:
         required: false
         default: '{}'
         description: Job matrix encoded as JSON.
-      job-index:
+      strategy-job-index:
         type: number
         required: false
         default: 0
-        description: Matrix job index.
+        description: The index of the current job in the matrix.
+      strategy-job-total:
+        type: number
+        required: false
+        default: 0
+        description: The total number of jobs in the matrix.
       env-json:
         type: string
         required: false
@@ -43,7 +48,8 @@ jobs:
     timeout-minutes: 60
     env:
       GITHUB_ACTIONS_JOB: ${{github.job}}
-      GITHUB_ACTIONS_JOB_INDEX: ${{inputs.job-index}}
+      GITHUB_ACTIONS_JOB_INDEX: ${{inputs.strategy-job-index}}
+      GITHUB_ACTIONS_JOB_TOTAL: ${{inputs.strategy-job-total}}
     steps:
     - name: Create matrix info
       id: matrix-info
@@ -86,6 +92,8 @@ jobs:
       uses: remal-github-actions/cache-gradle@main
       with:
         build-cache-for-branches-only: 'true'
+        strategy-job-index: ${{inputs.strategy-job-index}}
+        strategy-job-total: ${{inputs.strategy-job-total}}
     - name: Setup Java ${{fromJSON(inputs.job-matrix-json)['java-runtime'] && fromJSON(inputs.job-matrix-json)['java-runtime'] != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', matrix['java-runtime'], env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
       uses: actions/setup-java@v5
       with:
@@ -101,7 +109,7 @@ jobs:
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
 
     - name: Upload Jacoco merged report
-      if: ${{(strategy.job-index || '0') == '0'}}
+      if: ${{(inputs.strategy-job-index || '0') == '0'}}
       uses: actions/upload-artifact@v4
       with:
         name: jacoco-merged-report-${{inputs.os}}-${{steps.matrix-info.outputs.token}}

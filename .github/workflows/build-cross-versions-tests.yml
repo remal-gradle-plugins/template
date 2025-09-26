@@ -108,5 +108,6 @@ jobs:
       workflow-key: ${{inputs.workflow-key}}
       os: ${{inputs.os}}
       job-matrix-json: ${{toJSON(matrix)}}
-      job-index: ${{strategy.job-index||0}}
+      strategy-job-index: ${{strategy.job-index}}
+      strategy-job-total: ${{strategy.job-total}}
       env-json: ${{inputs.env-json}}
