@@ -10,7 +10,7 @@ on:
     - 'main'
     - 'master'
   schedule:
-  - cron: '24 1/4 * * *' # sync-with-template: adjust
+  - cron: '24 1/6 * * *' # sync-with-template: adjust
   workflow_dispatch:
     inputs:
       dryRun:
