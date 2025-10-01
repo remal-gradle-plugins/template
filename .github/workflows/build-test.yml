@@ -95,8 +95,6 @@ jobs:
       with:
         build-cache-for-branches-only: 'true'
         github-job: 'test-${{inputs.os}}-${{inputs.job-matrix-json}}'
-        strategy-job-index: ${{inputs.strategy-job-index}}
-        strategy-job-total: ${{inputs.strategy-job-total}}
     - name: Setup Java ${{env.CURRENT_JAVA_VERSION != env.DEFAULT_JAVA_VERSION && format('{0} and {1}', env.CURRENT_JAVA_VERSION, env.DEFAULT_JAVA_VERSION) || env.DEFAULT_JAVA_VERSION}}
       uses: actions/setup-java@v5
       with:
