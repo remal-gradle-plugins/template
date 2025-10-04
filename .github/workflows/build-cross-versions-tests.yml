@@ -28,7 +28,7 @@ on:
       gradle-stable-only:
         type: boolean
         required: false
-        default: false
+        default: true
         description: >-
           Test against stable Gradle versions only.
           Future RC versions won't be tested.
