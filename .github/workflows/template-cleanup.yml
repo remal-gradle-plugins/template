@@ -71,6 +71,9 @@ jobs:
         mkdir -p src/test/java/${PACKAGE//.//}
         cp -R src/test/java/name/remal/gradle_plugins/template/* src/test/java/${PACKAGE//.//}/
         rm -rf src/test/java/name/remal/gradle_plugins/template
+        mkdir -p src/functionalTest/java/${PACKAGE//.//}
+        cp -R src/test/functionalTest/name/remal/gradle_plugins/template/* src/functionalTest/java/${PACKAGE//.//}/
+        rm -rf src/test/functionalTest/name/remal/gradle_plugins/template
 
         rm -rf \
           .github/sync-with-template-local-transformations.yml \
