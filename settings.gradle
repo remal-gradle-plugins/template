@@ -3,5 +3,3 @@ plugins {
 }
 
 rootProject.name = 'template'
-
-include(':test')
