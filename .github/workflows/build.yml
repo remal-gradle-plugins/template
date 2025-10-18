@@ -162,9 +162,9 @@ jobs:
       run: |
         {
           echo 'list<<EOF'
-          git ls-files --modified --others | tee /proc/1/fd/1
+          git ls-files --modified --others
           echo 'EOF'
-        } >> "$GITHUB_OUTPUT"
+        } | tee -a "$GITHUB_OUTPUT"
     - name: Upload untracked and updated files
       if: ${{!cancelled()}}
       uses: actions/upload-artifact@v4
