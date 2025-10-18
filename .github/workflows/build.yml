@@ -160,11 +160,9 @@ jobs:
       if: ${{!cancelled()}}
       id: untracked-and-changed-files
       run: |
-        {
-          echo 'list<<EOF'
-          git ls-files --modified --others
-          echo 'EOF'
-        } | tee -a "$GITHUB_OUTPUT"
+        echo 'list<<EOF' >> "$GITHUB_OUTPUT"
+        git ls-files --modified --others  | tee -a "$GITHUB_OUTPUT"
+        echo 'EOF' >> "$GITHUB_OUTPUT"
     - name: Upload untracked and updated files
       if: ${{!cancelled()}}
       uses: actions/upload-artifact@v4
