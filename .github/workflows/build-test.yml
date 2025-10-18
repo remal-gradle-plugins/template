@@ -101,8 +101,14 @@ jobs:
           ${{env.CURRENT_JAVA_VERSION != env.DEFAULT_JAVA_VERSION && env.CURRENT_JAVA_VERSION || ''}}
           ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
-    - name: Download and extract workspace
-      uses: ./.github/workflows/actions/download-extract-workspace
+    - name: Download untracked and updated files
+      uses: Wandalen/wretry.action/main@v3.8.0
+      with:
+        action: actions/download-artifact@v5
+        attempt_limit: 3
+        attempt_delay: 5000
+        with: |
+          name: workspace
 
     - name: Execute tests
       run: |
