@@ -129,6 +129,7 @@ jobs:
       with:
         name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
         path: ${{steps.untracked-and-changed-files.outputs.list}}
+        include-hidden-files: true
         if-no-files-found: warn
         retention-days: 90
 
@@ -137,5 +138,6 @@ jobs:
       with:
         name: jacoco-matrix-exec-files-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
         path: '**/build/jacoco/*.exec'
-        if-no-files-found: ignore
+        include-hidden-files: true
+        if-no-files-found: warn
         retention-days: 90

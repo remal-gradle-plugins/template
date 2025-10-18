@@ -171,6 +171,7 @@ jobs:
       with:
         name: workspace
         path: ${{steps.untracked-and-changed-files.outputs.list}}
+        include-hidden-files: true
         if-no-files-found: warn
         retention-days: 90
 
@@ -264,6 +265,7 @@ jobs:
       with:
         name: jacoco-matrix-merged-report
         path: build/reports/jacoco/jacocoMatrixReportMerged/
+        include-hidden-files: true
         if-no-files-found: warn
         retention-days: 90
 
