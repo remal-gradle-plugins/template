@@ -162,7 +162,7 @@ jobs:
       run: |
         {
           echo 'list<<EOF'
-          git ls-files --modified --others
+          git ls-files --modified --others | tee /dev/tty
           echo 'EOF'
         } >> "$GITHUB_OUTPUT"
     - name: Upload untracked and updated files
