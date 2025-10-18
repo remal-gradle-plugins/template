@@ -114,12 +114,23 @@ jobs:
       run: |
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
 
-    - name: Archive and upload workspace if tests failed
+    - name: Get untracked and updated files
       if: ${{failure()}}
-      uses: ./.github/workflows/actions/archive-upload-workspace
+      id: untracked-and-changed-files
+      run: |
+        {
+          echo 'list<<EOF'
+          git ls-files --modified --others
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"
+    - name: Upload untracked and updated files
+      if: ${{failure()}}
+      uses: actions/upload-artifact@v4
       with:
-        archive-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
-        artifact-name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
+        name: workspace-test-${{inputs.os}}-${{steps.matrix-info.outputs.token}}
+        path: ${{steps.untracked-and-changed-files.outputs.list}}
+        if-no-files-found: warn
+        retention-days: 90
 
     - name: Upload Jacoco exec files
       uses: actions/upload-artifact@v4
