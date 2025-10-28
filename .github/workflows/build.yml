@@ -55,18 +55,12 @@ jobs:
         submodules: recursive
         fetch-depth: 1
 
-    - name: Validate Gradle Wrapper
-      uses: Wandalen/wretry.action/main@v3.8.0
-      with:
-        action: gradle/actions/wrapper-validation@v5
-        attempt_limit: 3
-        attempt_delay: 5000
-
     - name: Cache Gradle
       id: cache-gradle
       uses: remal-github-actions/cache-gradle@main
       with:
         build-cache-enabled: 'false'
+
     - name: Set DEFAULT_JAVA_VERSION
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       uses: ./.github/workflows/actions/set-default-java-version
@@ -76,10 +70,19 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+
+    - name: Validate Gradle Wrapper
+      if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true'}}
+      uses: Wandalen/wretry.action/main@v3.8.0
+      with:
+        action: gradle/actions/wrapper-validation@v5
+        attempt_limit: 3
+        attempt_delay: 5000
     - name: Create Gradle wrapper cache content
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true'}}
       run: |
         ./gradlew-retry-connection-timeouts help
+
     - name: Create Gradle caches cache content
       if: ${{steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       run: |
