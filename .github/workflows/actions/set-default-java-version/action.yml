@@ -14,7 +14,7 @@ runs:
     uses: remal-github-actions/read-property@v1
     with:
       file: gradle/gradle-daemon-jvm.properties
-      property: 'toolchainVersion'
+      property: 'toolchainVersio123n'
       failIfFileNotFound: 'false'
       failIfPropertyNotFound: 'false'
 
