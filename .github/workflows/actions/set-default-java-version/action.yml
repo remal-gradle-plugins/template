@@ -50,7 +50,6 @@ runs:
         || steps.daemon-java-version.outputs.value
         || steps.build-java-version.outputs.value
         }}
-    with:
-      run: |
-        echo "DEFAULT_JAVA_VERSION=$RESULT_VERSION" | tee -a $GITHUB_ENV
-        echo "version=$RESULT_VERSION" >> $GITHUB_OUTPUT
+    run: |
+      echo "DEFAULT_JAVA_VERSION=$RESULT_VERSION" | tee -a $GITHUB_ENV
+      echo "version=$RESULT_VERSION" >> $GITHUB_OUTPUT
