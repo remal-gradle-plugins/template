@@ -19,7 +19,7 @@ runs:
       failIfPropertyNotFound: 'false'
 
   - name: Read Gradle Daemon Java version
-    if: ${{!steps.build-java-version.outputs.value}}
+    if: ${{steps.build-java-version.outputs.value == ''}}
     id: daemon-java-version
     uses: remal-github-actions/read-property@v1
     with:
@@ -29,7 +29,7 @@ runs:
       failIfPropertyNotFound: 'false'
 
   - name: Retrieve max tested versions
-    if: ${{!steps.build-java-version.outputs.value && steps.daemon-java-version.outputs.value}}
+    if: ${{steps.build-java-version.outputs.value == '' && steps.daemon-java-version.outputs.value == ''}}
     id: max-java-version-matrix
     uses: remal-github-actions/matrix-versions@v1
     with:
@@ -40,6 +40,8 @@ runs:
           - once
           - lts
           - stable
+          includes:
+          - '(,25)'
 
   - name: Compose result
     id: result
