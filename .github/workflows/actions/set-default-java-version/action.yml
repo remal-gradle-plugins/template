@@ -29,7 +29,7 @@ runs:
       failIfPropertyNotFound: 'false'
 
   - name: Retrieve max tested versions
-    if: ${{steps.build-java-version.outputs.value == '' && steps.daemon-java-version.outputs.value == ''}}
+    if: ${{true || steps.build-java-version.outputs.value == '' && steps.daemon-java-version.outputs.value == ''}}
     id: max-java-version-matrix
     uses: remal-github-actions/matrix-versions@v1
     with:
