@@ -19,7 +19,6 @@ runs:
       failIfPropertyNotFound: 'false'
 
   - name: Read build Java version
-    if: ${{steps.daemon-java-version.outputs.value == ''}}
     id: build-java-version
     uses: remal-github-actions/read-property@v1
     with:
@@ -28,8 +27,8 @@ runs:
       failIfFileNotFound: 'false'
       failIfPropertyNotFound: 'false'
 
-  - name: Retrieve max tested versions
-    if: ${{true || steps.build-java-version.outputs.value == '' && steps.daemon-java-version.outputs.value == ''}}
+  - name: Retrieve LTS Java versions
+    if: ${{steps.daemon-java-version.outputs.value == '' && steps.build-java-version.outputs.value == ''}}
     id: max-java-version-matrix
     uses: remal-github-actions/matrix-versions@v1
     with:
@@ -47,11 +46,25 @@ runs:
     id: result
     shell: bash
     env:
-      RESULT_VERSION: ${{
-        steps.daemon-java-version.outputs.value
-        || steps.build-java-version.outputs.value
-        || steps.max-java-version-matrix.outputs.allMatrixIncludes && fromJSON(steps.max-java-version-matrix.outputs.allMatrixIncludes)[0].java
-        }}
+      DAEMON_VERSION: ${{steps.daemon-java-version.outputs.value}}
+      BUILD_VERSION: ${{steps.build-java-version.outputs.value}}
+      FALLBACK_VERSION: ${{steps.max-java-version-matrix.outputs.allMatrixIncludes && fromJSON(steps.max-java-version-matrix.outputs.allMatrixIncludes)[0].java}}
     run: |
-      echo "DEFAULT_JAVA_VERSION=$RESULT_VERSION" | tee -a $GITHUB_ENV
-      echo "version=$RESULT_VERSION" >> $GITHUB_OUTPUT
+      DAEMON_NUM=${DAEMON_VERSION%%[^0-9]*}
+      BUILD_NUM=${BUILD_VERSION%%[^0-9]*}
+      FALLBACK_NUM=${FALLBACK_VERSION%%[^0-9]*}
+      if [[ -n "$DAEMON_NUM" && -n "$BUILD_NUM" ]]; then
+        if (( DAEMON_NUM >= BUILD_NUM )); then
+          VERSION="$DAEMON_NUM"
+        else
+          VERSION="$BUILD_NUM"
+        fi
+      elif [[ -n "$DAEMON_NUM" ]]; then
+        VERSION="$DAEMON_NUM"
+      elif [[ -n "$BUILD_NUM" ]]; then
+        VERSION="$BUILD_NUM"
+      else
+        VERSION="$FALLBACK_NUM"
+      fi
+      echo "DEFAULT_JAVA_VERSION=$VERSION" | tee -a $GITHUB_ENV
+      echo "version=$VERSION" >> $GITHUB_OUTPUT
