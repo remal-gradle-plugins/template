@@ -70,14 +70,14 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
-
     - name: Validate Gradle Wrapper
-      if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true'}}
+      if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true' || steps.cache-gradle.outputs.gradle-caches-cache-hit != 'true'}}
       uses: Wandalen/wretry.action/main@v3.8.0
       with:
         action: gradle/actions/wrapper-validation@v5
         attempt_limit: 3
         attempt_delay: 5000
+
     - name: Create Gradle wrapper cache content
       if: ${{steps.cache-gradle.outputs.gradle-wrapper-cache-hit != 'true'}}
       run: |
@@ -115,8 +115,7 @@ jobs:
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
       uses: actions/setup-java@v5
       with:
-        java-version: |
-          ${{env.DEFAULT_JAVA_VERSION}}
+        java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
 
     - name: Retrieve repository info
