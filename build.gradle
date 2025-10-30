@@ -52,7 +52,7 @@ TaskProvider validateRepositoryProperties = tasks.register('validateRepositoryPr
     group = 'verification'
 
     Property<String> rootProjectNameProperty = objects.property(String).value(provider { project.rootProject.name }).with { it.finalizeValueOnRead(); it }
-    Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
+    Provider<String> repositoryNameProperty = project.githubRepositoryInfo.repository.map { it.name }
 
     doLast {
         String rootProjectName = rootProjectNameProperty.get()
@@ -69,7 +69,7 @@ tasks.named('check').configure { dependsOn(validateRepositoryProperties) }
 TaskProvider processGradleProperties = tasks.register('processGradleProperties') {
     outputs.upToDateWhen { false }
 
-    Property<String> repositoryNameProperty = objects.property(String).value(provider { project.ext['repository-name'] }).with { it.finalizeValueOnRead(); it }
+    Provider<String> repositoryNameProperty = project.githubRepositoryInfo.repository.map { it.name }
     RegularFileProperty gradlePropertiesFileProperty = objects.fileProperty().value(layout.projectDirectory.file('gradle.properties'))
 
     ListProperty<Integer> javaLtsVersions = objects.listProperty(Integer).value(provider { project.getLtsJavaRuntimeVersions() }).with { it.finalizeValueOnRead(); it }
@@ -91,7 +91,7 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
     doLast {
         String repositoryName = repositoryNameProperty.getOrNull() ?: ''
         if (repositoryName.isEmpty()) {
-            throw new GradleException("`repository-name` property is empty")
+            throw new GradleException("repositoryNameProperty is empty")
         }
         if (repositoryName != 'template') {
             throw new GradleException("This code should be executed for template repository only")
@@ -103,6 +103,12 @@ TaskProvider processGradleProperties = tasks.register('processGradleProperties')
 
         String content = file.getText('UTF-8')
         Map<String, String> handledProperties = [:]
+
+        content = content.replaceFirst(/((?:^|[\r\n]\s*)(java-runtime.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
+            String value = javaLtsVersions.get()[1]
+            handledProperties[groups[2]] = value
+            return "${groups[1]} = ${value}${groups[3]}"
+        }
 
         content = content.replaceFirst(/((?:^|[\r\n]\s*)(gradle-api.min-version))\s*=\s*\d+\S*(\s|$)/) { List<String> groups ->
             String value = lastMinorVersions.get().findAll { it == it.baseVersion }[1].version
