@@ -36,7 +36,6 @@ gradlePlugin {
             id = '%ID%'
             implementationClass = 'name.remal.gradle_plugins.template.TemplatePlugin'
             displayName = 'Plugin'
-            description = property('repository-description')
         }
     }
 }
