@@ -22,7 +22,8 @@ transformations:
   - .mergify/config.yml
   script: |
     return content
-        .replaceAll(/\bbuild\b/g, 'cross-versions-tests-success')
+        .replaceAll(/(`)build\1/g, '$1cross-versions-tests-success$1')
+        .replaceAll(/(=\s*)build('|\n|$)/g, '$1cross-versions-tests-success$2')
 - name: renovate
   format: text
   includes:
