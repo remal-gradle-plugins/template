@@ -245,9 +245,12 @@ jobs:
   push-back:
     if: >-
       ${{
-        (github.event_name == 'push' && github.ref == 'refs/heads/main')
-        || github.event_name == 'schedule'
-        || github.event_name == 'workflow_dispatch'
+        secrets.PUSH_BACK_TOKEN
+        && (
+          (github.event_name == 'push' && github.ref == 'refs/heads/main')
+          || github.event_name == 'schedule'
+          || github.event_name == 'workflow_dispatch'
+        )
       }}
     needs:
     - cross-versions-tests-success
@@ -259,6 +262,7 @@ jobs:
     env:
       DISABLE_COMPILATION: 'true'
       DISABLE_VERIFICATION: 'true'
+      GITHUB_ACTIONS_TOKEN: ${{secrets.PUSH_BACK_TOKEN}}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
