@@ -1,6 +1,6 @@
 **Tested on Java LTS versions from <!--property:java-runtime.min-version-->21<!--/property--> to <!--property:java-runtime.max-version-->25<!--/property-->.**
 
-**Tested on Gradle versions from <!--property:gradle-api.min-version-->9.2.0<!--/property--> to <!--property:gradle-api.max-version-->9.3.0<!--/property-->.**
+**Tested on Gradle versions from <!--property:gradle-api.min-version-->9.2.0<!--/property--> to <!--property:gradle-api.max-version-->9.3.1<!--/property-->.**
 
 # `name.remal.template` plugin
 
