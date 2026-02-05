@@ -6,7 +6,7 @@ on:
     - main
 
 permissions:
-  contents: write
+  id-token: write
 
 concurrency:
   group: template-cleanup-${{github.ref}}
@@ -23,8 +23,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+    - name: Get GitHub Token
+      id: get-token
+      uses: remal/github-repository-token-issuer@v1
+      with:
+        scopes: |
+          contents: write
+          workflows: write
+
     - name: Checkout repository
       uses: actions/checkout@v6
+      with:
+        token: ${{steps.get-token.outputs.token}}
 
     - name: Cleanup
       run: |
@@ -85,7 +95,6 @@ jobs:
       if: ${{github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')}}
       uses: remal-github-actions/push-back@v2
       with:
-        githubToken: ${{secrets.PUSH_BACK_TOKEN || github.token}}
         message: 'Template cleanup'
 
     - name: Fail if the repository was changed before pushing back
