@@ -36,3 +36,17 @@ transformations:
       // $$$sync-with-template-modifiable: local $$$
       // $$$sync-with-template-modifiable-end$$$
     }
+- name: .github/sync-with-template.yml
+  format: yaml
+  includes:
+  - .github/sync-with-template.yml
+  script: |
+    content.includes = content.includes ?? []
+    ;[
+      '.claude/rules/*.md',
+    ].forEach(path => {
+      if (!content.includes.includes(path)) {
+        content.includes.push(path)
+      }
+    })
+    return content
