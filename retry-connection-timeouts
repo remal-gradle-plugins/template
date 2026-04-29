@@ -51,6 +51,9 @@ for ATTEMPT in $(seq 1 2); do
     elif STR="Server returned HTTP response code: 50" && grep -q -i "$STR" "$LOGFILE"; then
         echo "::warning::'$STR' found in $* command log file $LOGFILE"
 
+    elif STR="ArtifactNotFoundException: Could not find gradle-api" && grep -q -i "$STR" "$LOGFILE"; then
+        echo "::warning::'$STR' found in $* command log file $LOGFILE"
+
     else
         break
     fi
