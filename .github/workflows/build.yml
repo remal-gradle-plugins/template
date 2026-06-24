@@ -47,6 +47,9 @@ jobs:
         || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[push-back]') && !contains(github.event.head_commit.message, '[noci]') && !contains(github.event.head_commit.message, '[no-ci]'))
         || github.event_name != 'push'
       }}
+    concurrency:
+      group: build-populate-cache-${{github.ref}}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -98,6 +101,9 @@ jobs:
       publish-isGradlePlugin: ${{steps.publish-flags.outputs.isGradlePlugin}}
       publish-isMavenCentral: ${{steps.publish-flags.outputs.isMavenCentral}}
       env-json: ${{steps.prepare-env-for-cross-versions-tests.outputs.env-json}}
+    concurrency:
+      group: build-build-${{github.ref}}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -249,6 +255,9 @@ jobs:
       }}
     needs:
     - cross-versions-tests-success
+    concurrency:
+      group: build-push-back-${{github.ref}}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -354,6 +363,9 @@ jobs:
     needs:
     - parse-git-tag
     - build
+    concurrency:
+      group: build-publish-to-gradle-plugins-portal-${{github.ref}}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -400,6 +412,9 @@ jobs:
     needs:
     - parse-git-tag
     - build
+    concurrency:
+      group: build-publish-to-maven-central-${{github.ref}}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
