@@ -44,11 +44,17 @@ env:
 
 jobs:
   create-matrix:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       matrix-includes: ${{steps.matrix-versions.outputs.allMatrixIncludes}}
     steps:
+    - name: Cancel on newer run
+      uses: ./.github/workflows/actions/cancel-on-newer-run
+
     - name: Checkout repository
       uses: actions/checkout@v6
       with:

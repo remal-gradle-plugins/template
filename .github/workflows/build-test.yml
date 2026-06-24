@@ -41,6 +41,9 @@ env:
 jobs:
   test:
     name: "test ${{inputs.os}} ${{inputs.job-matrix-json}}"
+    permissions:
+      id-token: write
+      contents: read
     concurrency:
       group: build-test-${{inputs.os}}-${{inputs.job-matrix-json}}-${{github.ref}}
       cancel-in-progress: true
@@ -51,6 +54,9 @@ jobs:
       GITHUB_ACTIONS_JOB_INDEX: ${{inputs.strategy-job-index}}
       GITHUB_ACTIONS_JOB_TOTAL: ${{inputs.strategy-job-total}}
     steps:
+    - name: Cancel on newer run
+      uses: ./.github/workflows/actions/cancel-on-newer-run
+
     - name: Create matrix info
       id: matrix-info
       uses: actions/github-script@v9
