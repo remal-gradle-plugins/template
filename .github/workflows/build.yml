@@ -57,14 +57,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-    - name: Cancel on newer run
-      uses: ./.github/workflows/actions/cancel-on-newer-run
-
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
         submodules: recursive
         fetch-depth: 1
+
+    - name: Cancel on newer run
+      uses: ./.github/workflows/actions/cancel-on-newer-run
 
     - name: Cache Gradle
       id: cache-gradle
@@ -117,14 +117,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-    - name: Cancel on newer run
-      uses: ./.github/workflows/actions/cancel-on-newer-run
-
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
         submodules: recursive
         fetch-depth: 1
+
+    - name: Cancel on newer run
+      uses: ./.github/workflows/actions/cancel-on-newer-run
+
     - name: Cache Gradle
       uses: remal-github-actions/cache-gradle@v1
     - name: Set DEFAULT_JAVA_VERSION

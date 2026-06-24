@@ -54,6 +54,12 @@ jobs:
       GITHUB_ACTIONS_JOB_INDEX: ${{inputs.strategy-job-index}}
       GITHUB_ACTIONS_JOB_TOTAL: ${{inputs.strategy-job-total}}
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+        fetch-depth: 1
+
     - name: Cancel on newer run
       uses: ./.github/workflows/actions/cancel-on-newer-run
 
@@ -91,11 +97,6 @@ jobs:
           core.exportVariable('CURRENT_JAVA_VERSION', '${{fromJSON(inputs.job-matrix-json)['java-runtime'] || ''}}' || process.env.DEFAULT_JAVA_VERSION || '')
           core.exportVariable('DISABLE_COMPILATION', 'true')
           core.exportVariable('DISABLE_VERIFICATION_EXCEPT_TESTS', 'true')
-    - name: Checkout repository
-      uses: actions/checkout@v6
-      with:
-        submodules: recursive
-        fetch-depth: 1
     - name: Cache Gradle
       uses: remal-github-actions/cache-gradle@v1
       with:

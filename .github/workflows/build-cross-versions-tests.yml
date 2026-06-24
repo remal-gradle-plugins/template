@@ -52,14 +52,14 @@ jobs:
     outputs:
       matrix-includes: ${{steps.matrix-versions.outputs.allMatrixIncludes}}
     steps:
-    - name: Cancel on newer run
-      uses: ./.github/workflows/actions/cancel-on-newer-run
-
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
         submodules: recursive
         fetch-depth: 1
+
+    - name: Cancel on newer run
+      uses: ./.github/workflows/actions/cancel-on-newer-run
 
     - name: Read min supported Java version
       id: min-java-version
