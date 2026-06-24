@@ -47,9 +47,9 @@ runs:
       WORKFLOW_ID=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '.workflow_id')
       echo "Workflow ID: $WORKFLOW_ID"
 
-      # The API "branch" parameter matches head_branch (short name), which is the same
-      # for both branches and tags. We distinguish them below using event and pull_requests.
-      RUNS_JSON=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_ID/runs" \
+      # Use the repo-level runs endpoint (the workflow-specific endpoint may 404
+      # with installation tokens). Filter by workflow_id in jq.
+      RUNS_JSON=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs" \
         -f branch="$BRANCH_FILTER" \
         -F per_page=25)
 
@@ -64,9 +64,11 @@ runs:
         NEWER_COUNT=$(echo "$RUNS_JSON" | jq \
           --argjson run_number "$RUN_NUMBER" \
           --argjson pr_number "$PR_NUMBER" \
+          --argjson workflow_id "$WORKFLOW_ID" \
           --arg head_branch "$BRANCH_FILTER" \
           '[.workflow_runs[] | select(
             .run_number > $run_number
+            and .workflow_id == $workflow_id
             and .head_branch == $head_branch
             and .event == "pull_request"
             and (.pull_requests | any(.number == $pr_number))
@@ -76,9 +78,11 @@ runs:
         # Get check_suite_node_id for each candidate non-PR run
         CANDIDATE_NODE_IDS=$(echo "$RUNS_JSON" | jq -r \
           --argjson run_number "$RUN_NUMBER" \
+          --argjson workflow_id "$WORKFLOW_ID" \
           --arg head_branch "$BRANCH_FILTER" \
           '[.workflow_runs[] | select(
             .run_number > $run_number
+            and .workflow_id == $workflow_id
             and .head_branch == $head_branch
             and .event != "pull_request"
           )] | .[].check_suite_node_id')
