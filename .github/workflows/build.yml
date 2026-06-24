@@ -111,7 +111,7 @@ jobs:
       env-json: ${{steps.prepare-env-for-cross-versions-tests.outputs.env-json}}
     permissions:
       id-token: write
-      contents: read
+      contents: write
     concurrency:
       group: build-build-${{github.ref}}
       cancel-in-progress: true
