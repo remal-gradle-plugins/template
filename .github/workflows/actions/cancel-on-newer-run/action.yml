@@ -49,7 +49,7 @@ runs:
 
       # Use the repo-level runs endpoint (the workflow-specific endpoint may 404
       # with installation tokens). Filter by workflow_id in jq.
-      RUNS_JSON=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs" \
+      RUNS_JSON=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs" --method GET \
         -f branch="$BRANCH_FILTER" \
         -F per_page=25)
 
