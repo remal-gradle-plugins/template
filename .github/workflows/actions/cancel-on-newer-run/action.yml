@@ -133,24 +133,24 @@ runs:
   - name: Wait for cancellation (1/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
   - name: Wait for cancellation (2/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
   - name: Wait for cancellation (3/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
   - name: Wait for cancellation (4/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
   - name: Wait for cancellation (5/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
   - name: Wait for cancellation (6/6)
     if: ${{steps.check.outputs.cancel == 'true'}}
     shell: bash
-    run: sleep 10
+    run: sleep 5
