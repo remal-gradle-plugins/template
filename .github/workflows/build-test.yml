@@ -114,9 +114,10 @@ jobs:
         validate-wrappers: false
         workflow-job-context: ${{inputs.job-matrix-json}}
         cache-read-only: ${{inputs.os == 'ubuntu'}}
-    - name: Cache Gradle build cache
+    - name: Restore Gradle build cache
+      id: restore-gradle-build-cache
       if: ${{inputs.os == 'ubuntu' && env.GRADLE_BUILD_CACHE_ENABLED == 'true'}}
-      uses: actions/cache@v6
+      uses: actions/cache/restore@v6
       with:
         path: ~/.gradle/caches/build-cache-*
         key: gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.sha}}
@@ -128,6 +129,19 @@ jobs:
     - name: Execute tests
       run: |
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
+
+    - name: Save Gradle build cache
+      if: >-
+        ${{
+          github.ref == 'refs/heads/main'
+          && inputs.os == 'ubuntu'
+          && env.GRADLE_BUILD_CACHE_ENABLED == 'true'
+          && steps.restore-gradle-build-cache.outputs.cache-hit != 'true'
+        }}
+      uses: actions/cache/save@v6
+      with:
+        path: ~/.gradle/caches/build-cache-*
+        key: gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.sha}}
 
     - name: Archive and upload workspace if tests failed
       if: ${{failure()}}
