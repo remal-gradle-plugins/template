@@ -194,10 +194,6 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 1
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v6
-      with:
-        validate-wrappers: false
     - name: Set DEFAULT_JAVA_VERSION
       uses: ./.github/workflows/actions/set-default-java-version
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
@@ -205,6 +201,11 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        validate-wrappers: false
+        cache-read-only: true
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
 
@@ -255,10 +256,6 @@ jobs:
         token: ${{secrets.PUSH_BACK_TOKEN}}
         submodules: recursive
         fetch-depth: 1
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v6
-      with:
-        validate-wrappers: false
     - name: Set DEFAULT_JAVA_VERSION
       uses: ./.github/workflows/actions/set-default-java-version
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
@@ -266,6 +263,11 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        validate-wrappers: false
+        cache-read-only: true
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
 
@@ -364,10 +366,6 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 1
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v6
-      with:
-        validate-wrappers: false
     - name: Set DEFAULT_JAVA_VERSION
       uses: ./.github/workflows/actions/set-default-java-version
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
@@ -375,6 +373,11 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        validate-wrappers: false
+        cache-read-only: true
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
 
@@ -415,10 +418,6 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 1
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v6
-      with:
-        validate-wrappers: false
     - name: Set DEFAULT_JAVA_VERSION
       uses: ./.github/workflows/actions/set-default-java-version
     - name: Setup Java ${{env.DEFAULT_JAVA_VERSION}}
@@ -426,6 +425,11 @@ jobs:
       with:
         java-version: ${{env.DEFAULT_JAVA_VERSION}}
         distribution: temurin
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        validate-wrappers: false
+        cache-read-only: true
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
 
