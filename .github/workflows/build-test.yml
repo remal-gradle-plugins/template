@@ -113,6 +113,15 @@ jobs:
       with:
         validate-wrappers: false
         workflow-job-context: ${{inputs.job-matrix-json}}
+        cache-read-only: ${{inputs.os == 'ubuntu'}}
+    - name: Cache Gradle build cache
+      if: ${{inputs.os == 'ubuntu' && env.GRADLE_BUILD_CACHE_ENABLED == 'true'}}
+      uses: actions/cache@v6
+      with:
+        path: ~/.gradle/caches/build-cache-*
+        key: gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.sha}}
+        restore-keys: |
+          gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-
     - name: Download and extract workspace
       uses: ./.github/workflows/actions/download-extract-workspace
 
