@@ -139,7 +139,15 @@ jobs:
         script: |
           const envObj = JSON.parse(process.env.ENV_JSON)
           for (const name of Object.keys(envObj)) {
-            if (name.startsWith('GITHUB_')) {
+            if (name.startsWith('GITHUB_')
+              || name.startsWith('INPUT_')
+              || name.startsWith('JAVA_HOME')
+              || name.startsWith('GRADLE_BUILD_ACTION_')
+              || name.startsWith('DEVELOCITY_INJECTION_')
+              || name === 'GRADLE_ACTION_ID'
+              || name === 'GRADLE_USER_HOME'
+              || name === 'MAVEN_ARGS'
+            ) {
               delete envObj[name]
             }
           }
