@@ -75,9 +75,22 @@ runs:
             and (.pull_requests | any(.number == $pr_number))
           )] | length')
         echo "Newer PR runs for #$PR_NUMBER: $NEWER_COUNT"
+        NEWER_RUN_URLS=$(echo "$RUNS_JSON" | jq -r \
+          --argjson run_number "$RUN_NUMBER" \
+          --argjson pr_number "$PR_NUMBER" \
+          --argjson workflow_id "$WORKFLOW_ID" \
+          --arg head_branch "$BRANCH_FILTER" \
+          --arg server_url "$GITHUB_SERVER_URL" \
+          --arg repo "$GITHUB_REPOSITORY" \
+          '[.workflow_runs[] | select(
+            .run_number > $run_number
+            and .workflow_id == $workflow_id
+            and .head_branch == $head_branch
+            and .event == "pull_request"
+            and (.pull_requests | any(.number == $pr_number))
+          )] | map("\($server_url)/\($repo)/actions/runs/\(.id)") | join(" ")')
       else
-        # Get check_suite_node_id for each candidate non-PR run
-        CANDIDATE_NODE_IDS=$(echo "$RUNS_JSON" | jq -r \
+        CANDIDATES=$(echo "$RUNS_JSON" | jq \
           --argjson run_number "$RUN_NUMBER" \
           --argjson workflow_id "$WORKFLOW_ID" \
           --arg head_branch "$BRANCH_FILTER" \
@@ -86,7 +99,8 @@ runs:
             and .workflow_id == $workflow_id
             and .head_branch == $head_branch
             and .event != "pull_request"
-          )] | .[].check_suite_node_id')
+          )]')
+        CANDIDATE_NODE_IDS=$(echo "$CANDIDATES" | jq -r '.[].check_suite_node_id')
 
         if [ -z "$CANDIDATE_NODE_IDS" ]; then
           echo "No candidate non-PR runs found"
@@ -120,12 +134,20 @@ runs:
           NEWER_COUNT=$(echo "$GRAPHQL_RESULT" \
             | jq "[.data | to_entries[] | select(.value.branch.prefix == \"$EXPECTED_PREFIX\")] | length")
           echo "Newer runs with matching ref type: $NEWER_COUNT"
+          NEWER_RUN_URLS=$(echo "$GRAPHQL_RESULT" | jq -r \
+            --arg prefix "$EXPECTED_PREFIX" \
+            --argjson candidates "$CANDIDATES" \
+            --arg server_url "$GITHUB_SERVER_URL" \
+            --arg repo "$GITHUB_REPOSITORY" \
+            '[.data | to_entries[] | select(.value.branch.prefix == $prefix) | .key | ltrimstr("cs") | tonumber]
+             | map("\($server_url)/\($repo)/actions/runs/\($candidates[.].id)")
+             | join(" ")')
         fi
       fi
 
       if [ "$NEWER_COUNT" -gt 0 ]; then
         echo "cancel=true" | tee -a "$GITHUB_OUTPUT"
-        echo "::warning::Newer run detected for $CURRENT_REF, cancelling this run"
+        echo "::warning::Newer run detected for $CURRENT_REF, cancelling this run. Newer runs: $NEWER_RUN_URLS"
         gh run cancel "$RUN_ID" --repo "$GITHUB_REPOSITORY"
       else
         echo "No newer runs found, continuing"
