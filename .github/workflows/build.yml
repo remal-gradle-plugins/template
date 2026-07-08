@@ -105,11 +105,6 @@ jobs:
       id: repository-info
       uses: remal-github-actions/retrieve-repository-info@v1
 
-    - name: Submit dependencies to GitHub
-      if: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && startsWith(github.ref, 'refs/heads/')}}
-      run: |
-        ./gradlew-retry-connection-timeouts githubSubmitDependencies
-
     - name: Compile classes
       run: |
         ./gradlew-retry-connection-timeouts allClasses
