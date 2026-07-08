@@ -130,19 +130,6 @@ jobs:
       run: |
         ./gradlew-retry-connection-timeouts allTests jacocoReportMerged displayTotalCodeCoverage ${{steps.matrix-info.outputs.gradle-args}}
 
-    - name: Save Gradle build cache
-      if: >-
-        ${{
-          github.ref == 'refs/heads/main'
-          && inputs.os == 'ubuntu'
-          && env.GRADLE_BUILD_CACHE_ENABLED == 'true'
-          && steps.restore-gradle-build-cache.outputs.cache-hit != 'true'
-        }}
-      uses: actions/cache/save@v6
-      with:
-        path: ~/.gradle/caches/build-cache-*
-        key: gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.sha}}
-
     - name: Archive and upload workspace if tests failed
       if: ${{failure()}}
       uses: ./.github/workflows/actions/archive-upload-workspace
@@ -158,3 +145,16 @@ jobs:
         include-hidden-files: true
         if-no-files-found: warn
         retention-days: 90
+
+    - name: Save Gradle build cache
+      if: >-
+        ${{
+          github.ref == 'refs/heads/main'
+          && inputs.os == 'ubuntu'
+          && env.GRADLE_BUILD_CACHE_ENABLED == 'true'
+          && steps.restore-gradle-build-cache.outputs.cache-hit != 'true'
+        }}
+      uses: actions/cache/save@v6
+      with:
+        path: ~/.gradle/caches/build-cache-*
+        key: gradle-build-cache-${{inputs.os}}-${{steps.matrix-info.outputs.token}}-${{github.sha}}
