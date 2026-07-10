@@ -109,7 +109,7 @@ jobs:
     - name: Compile classes
       run: |
         ./gradlew-retry-connection-timeouts allClasses
-        echo "DISABLE_COMPILATION=true" | tee -a $GITHUB_ENV
+        echo "DISABLE_COMPILATION=true" | tee -a "$GITHUB_ENV"
     - name: Build without tests
       run: |
         ./gradlew-retry-connection-timeouts build publishToMavenLocal -Pdisable-tests=true
@@ -118,14 +118,14 @@ jobs:
       id: publish-flags
       run: |
         if [ -f "build/publish-gradle-plugin.flag" ]; then
-          echo "isGradlePlugin=true" | tee -a $GITHUB_OUTPUT
+          echo "isGradlePlugin=true" | tee -a "$GITHUB_OUTPUT"
         else
-          echo "isGradlePlugin=false" | tee -a $GITHUB_OUTPUT
+          echo "isGradlePlugin=false" | tee -a "$GITHUB_OUTPUT"
         fi
         if [ -f "build/publish-maven-central.flag" ]; then
-          echo "isMavenCentral=true" | tee -a $GITHUB_OUTPUT
+          echo "isMavenCentral=true" | tee -a "$GITHUB_OUTPUT"
         else
-          echo "isMavenCentral=false" | tee -a $GITHUB_OUTPUT
+          echo "isMavenCentral=false" | tee -a "$GITHUB_OUTPUT"
         fi
     - name: Archive and upload workspace
       if: ${{!cancelled()}}

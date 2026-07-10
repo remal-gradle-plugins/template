@@ -42,28 +42,28 @@ jobs:
         export LANG=C
 
         NAME="${GITHUB_REPOSITORY##*/}"
-        ACTOR=$(echo $GITHUB_ACTOR | tr '[:upper:]' '[:lower:]')
+        ACTOR=$(echo "$GITHUB_ACTOR" | tr '[:upper:]' '[:lower:]')
 
         if [ "${{github.repository_owner}}" == "remal-gradle-plugins" ]; then
           GROUP_PREFIX="name.remal.gradle-plugins"
         else
-          GROUP_PREFIX_ACTOR=$(echo $ACTOR | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
+          GROUP_PREFIX_ACTOR=$(echo "$ACTOR" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
           GROUP_PREFIX="com.github.$GROUP_PREFIX_ACTOR"
         fi
 
-        ID_NAME=$(echo $NAME | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
+        ID_NAME=$(echo "$NAME" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
         if [ "${{github.repository_owner}}" == "remal-gradle-plugins" ]; then
           ID="name.remal.$ID_NAME"
         else
-          ID_ACTOR=$(echo $ACTOR | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
+          ID_ACTOR=$(echo "$ACTOR" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')
           ID="com.github.$ID_ACTOR.$ID_NAME"
         fi
 
-        PACKAGE_NAME=$(echo $NAME | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
+        PACKAGE_NAME=$(echo "$NAME" | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
         if [ "${{github.repository_owner}}" == "remal-gradle-plugins" ]; then
           PACKAGE="name.remal.gradle_plugins.$PACKAGE_NAME"
         else
-          PACKAGE_ACTOR=$(echo $ACTOR | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
+          PACKAGE_ACTOR=$(echo "$ACTOR" | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
           PACKAGE="com.github.$PACKAGE_ACTOR.$PACKAGE_NAME"
         fi
 
@@ -75,14 +75,14 @@ jobs:
         cp -R .github/template-cleanup/. .
 
         find . -not \( -path "./.git/*" \) -type f -exec sed -i "s/name.remal.gradle_plugins.template/$PACKAGE/g" {} +
-        mkdir -p src/main/java/${PACKAGE//.//}
-        cp -R src/main/java/name/remal/gradle_plugins/template/* src/main/java/${PACKAGE//.//}/
+        mkdir -p "src/main/java/${PACKAGE//.//}"
+        cp -R src/main/java/name/remal/gradle_plugins/template/* "src/main/java/${PACKAGE//.//}/"
         rm -rf src/main/java/name/remal/gradle_plugins/template
-        mkdir -p src/test/java/${PACKAGE//.//}
-        cp -R src/test/java/name/remal/gradle_plugins/template/* src/test/java/${PACKAGE//.//}/
+        mkdir -p "src/test/java/${PACKAGE//.//}"
+        cp -R src/test/java/name/remal/gradle_plugins/template/* "src/test/java/${PACKAGE//.//}/"
         rm -rf src/test/java/name/remal/gradle_plugins/template
-        mkdir -p src/functionalTest/java/${PACKAGE//.//}
-        cp -R src/functionalTest/java/name/remal/gradle_plugins/template/* src/functionalTest/java/${PACKAGE//.//}/
+        mkdir -p "src/functionalTest/java/${PACKAGE//.//}"
+        cp -R src/functionalTest/java/name/remal/gradle_plugins/template/* "src/functionalTest/java/${PACKAGE//.//}/"
         rm -rf src/functionalTest/java/name/remal/gradle_plugins/template
 
         rm -rf \
