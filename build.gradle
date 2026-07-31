@@ -45,6 +45,11 @@ gradlePlugin {
             id = 'name.remal.template-plugin'
             implementationClass = 'name.remal.gradle_plugins.template.TemplatePlugin'
             displayName = 'Template plugin'
+            compatibility {
+                features {
+                    configurationCache = true
+                }
+            }
         }
     }
 }
