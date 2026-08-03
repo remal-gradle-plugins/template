@@ -1,12 +1,12 @@
 package name.remal.gradle_plugins.template;
 
-import org.gradle.api.Plugin;
+import name.remal.gradle_plugins.toolkit.AbstractSettingsAwarePlugin;
 import org.gradle.api.Project;
 
-public abstract class TemplatePlugin implements Plugin<Project> {
+public abstract class TemplatePlugin extends AbstractSettingsAwarePlugin {
 
     @Override
-    public void apply(Project project) {
+    protected void applyToProject(Project project) {
         // do nothing
     }
 
