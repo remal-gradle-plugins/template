@@ -12,7 +12,7 @@ inputs:
     description: Artifact name
   artifact-retention-days:
     required: false
-    default: 90
+    default: "7"
     description: Artifact retention days
 
 outputs:
