@@ -4,7 +4,7 @@
 
 # `name.remal.template` plugin
 
-[![configuration cache: supported](https://img.shields.io/static/v1?label=configuration%20cache&message=supported&color=success)](https://docs.gradle.org/current/userguide/configuration_cache.html)
+[![configuration cache: supported](https://img.shields.io/static/v1?label=configuration%20cache&message=supported&color=success)](https://docs.gradle.org/current/userguide/configuration_cache.html) [![isolated projects: supported](https://img.shields.io/static/v1?label=isolated%20projects&message=supported&color=success)](https://docs.gradle.org/current/userguide/isolated_projects.html)
 
 Usage:
 
